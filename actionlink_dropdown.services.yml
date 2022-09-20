@@ -1,0 +1,4 @@
+services:
+  plugin.manager.menu.local_action:
+    class: Drupal\actionlink_dropdown\Menu\LocalActionManager
+    arguments: ['@http_kernel.controller.argument_resolver', '@request_stack', '@current_route_match', '@router.route_provider', '@module_handler', '@cache.discovery', '@language_manager', '@access_manager', '@current_user']

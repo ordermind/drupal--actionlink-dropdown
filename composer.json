@@ -1,4 +1,7 @@
 {
     "name": "drupal/actionlink_dropdown",
-    "type": "drupal-module"
+    "type": "drupal-module",
+    "dependencies": {
+        "gamez/typed-collection": "^5.2"
+    }
 }

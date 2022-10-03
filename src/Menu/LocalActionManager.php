@@ -10,13 +10,15 @@ use Drupal\Core\Menu\LocalActionInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
 
-class LocalActionManager extends BaseManager {
+class LocalActionManager extends BaseManager
+{
   use StringTranslationTrait;
 
   /**
    * {@inheritdoc}
    */
-  public function getActionsForRoute($route_appears) {
+  public function getActionsForRoute($route_appears)
+  {
     if (!isset($this->instances[$route_appears])) {
       $route_names = [];
       $this->instances[$route_appears] = [];
@@ -52,9 +54,10 @@ class LocalActionManager extends BaseManager {
     return $links;
   }
 
-  protected function createRenderElement(LocalActionInterface $plugin): array {
+  protected function createRenderElement(LocalActionInterface $plugin): array
+  {
     $options = $plugin->getOptions($this->routeMatch);
-    $type = $options['type'] ?? NULL;
+    $type = $options['widget'] ?? NULL;
     if (
       $type === LocalActionDropdownTypeEnum::SELECT
       || $type === LocalActionDropdownTypeEnum::DETAILS
@@ -66,7 +69,8 @@ class LocalActionManager extends BaseManager {
     return $this->createRenderElementForRegularLink($plugin);
   }
 
-  protected function createRenderElementForRegularLink(LocalActionInterface $plugin): array {
+  protected function createRenderElementForRegularLink(LocalActionInterface $plugin): array
+  {
     $route_name = $plugin->getRouteName();
     $route_parameters = $plugin->getRouteParameters($this->routeMatch);
     $access = $this->accessManager->checkNamedRoute($route_name, $route_parameters, $this->account, TRUE);
@@ -83,7 +87,8 @@ class LocalActionManager extends BaseManager {
     ];
   }
 
-  protected function createRenderElementForDropdownLink(LocalActionInterface $plugin, string $type): array {
+  protected function createRenderElementForDropdownLink(LocalActionInterface $plugin, string $type): array
+  {
     $pluginOptions = $plugin->getOptions($this->routeMatch);
 
     $translationContext = $plugin->getPluginDefinition()['provider'];
@@ -134,7 +139,7 @@ class LocalActionManager extends BaseManager {
       '#dropdown' => [
         'title' => $this->getTitle($plugin),
         'options' => array_map(
-          function (array $option) use($translationContext) {
+          function (array $option) use ($translationContext) {
             unset($option['access_result']);
 
             $option['title'] = $this->t($option['title'], [], ['context' => $translationContext]);
@@ -148,5 +153,4 @@ class LocalActionManager extends BaseManager {
       '#access' => $firstOption['access_result'],
     ];
   }
-
 }

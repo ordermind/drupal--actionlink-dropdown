@@ -1,7 +1,11 @@
 <?php
 
-namespace Drupal\actionlink_dropdown\Factory;
+namespace Drupal\actionlink_dropdown\Collection;
 
-class LocalActionOptionCollection
+use Drupal\actionlink_dropdown\ValueObject\LocalActionOption;
+use Gamez\Illuminate\Support\TypedCollection;
+
+class LocalActionOptionCollection extends TypedCollection
 {
+    protected static $allowedTypes = [LocalActionOption::class];
 }

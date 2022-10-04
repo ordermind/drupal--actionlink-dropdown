@@ -3,6 +3,8 @@
 namespace Drupal\actionlink_dropdown\Menu;
 
 use Drupal\actionlink_dropdown\Enum\LocalActionDropdownTypeEnum;
+use Drupal\actionlink_dropdown\Factory\OptionsFactory;
+use Drupal\actionlink_dropdown\ValueObject\LocalActionOption;
 use Drupal\Core\Menu\LocalActionManager as BaseManager;
 
 use Drupal\Core\Cache\CacheableMetadata;
@@ -10,9 +12,50 @@ use Drupal\Core\Menu\LocalActionInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
 
+use Drupal\Core\Access\AccessManagerInterface;
+use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Language\LanguageManagerInterface;
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Routing\RouteProviderInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface;
+use Drupal\Core\Session\AccountInterface;
+
 class LocalActionManager extends BaseManager
 {
   use StringTranslationTrait;
+
+  protected OptionsFactory $optionsFactory;
+
+  public function __construct(
+    ArgumentResolverInterface $argumentResolver,
+    RequestStack $requestStack,
+    RouteMatchInterface $routeMatch,
+    RouteProviderInterface $routeProvider,
+    ModuleHandlerInterface $moduleHandler,
+    CacheBackendInterface $cacheBackend,
+    LanguageManagerInterface $languageManager,
+    AccessManagerInterface $accessManager,
+    AccountInterface $account,
+    OptionsFactory $optionsFactory
+  ) {
+    parent::__construct(
+      $argumentResolver,
+      $requestStack,
+      $routeMatch,
+      $routeProvider,
+      $moduleHandler,
+      $cacheBackend,
+      $languageManager,
+      $accessManager,
+      $account
+    );
+
+    $this->optionsFactory = $optionsFactory;
+  }
+
 
   /**
    * {@inheritdoc}
@@ -47,7 +90,7 @@ class LocalActionManager extends BaseManager
       }
 
       $links[$plugin_id] = $renderArray;
-      $cacheability->addCacheableDependency($renderArray['#access'])->addCacheableDependency($plugin);
+      $cacheability->addCacheableDependency(AccessResult::allowed())->addCacheableDependency($plugin);
     }
     $cacheability->applyTo($links);
 
@@ -93,43 +136,22 @@ class LocalActionManager extends BaseManager
 
     $translationContext = $plugin->getPluginDefinition()['provider'];
 
-    $allowedOptions = array_filter(
-      array_map(
-        function (array $option) {
-          $accessResult = $this->accessManager->checkNamedRoute(
-            $option['route_name'],
-            $option['route_parameters'] ?? [],
-            $this->account,
-            TRUE
-          );
+    $options = $this->optionsFactory->createOptions($pluginOptions, $this->account, $translationContext);
 
-          if (!$accessResult->isAllowed()) {
-            return NULL;
-          }
-
-          return $option + ['access_result' => $accessResult];
-        },
-        $pluginOptions['dropdown_options']
-      )
-    );
-
-    if (empty($allowedOptions)) {
+    if (empty($options)) {
       return [];
     }
 
-    $firstOption = reset($allowedOptions);
-
-    if (count($allowedOptions) == 1) {
-      $route_name = $firstOption['route_name'];
-      $route_parameters = $firstOption['route_parameters'] ?? [];
+    if ($options->count() === 1) {
+      /** @var LocalActionOption $firstOption */
+      $firstOption = $options->first();
       return [
         '#theme' => 'menu_local_action',
         '#link' => [
-          'title' => $this->t($pluginOptions['fallback_title_prefix'] . ' @option', ['@option' => $this->t($firstOption['title'])], ['context' => $translationContext]),
-          'url' => Url::fromRoute($route_name, $route_parameters),
-          'localized_options' => $plugin->getOptions($this->routeMatch),
+          'title' => $firstOption->getTitle(),
+          'url' => Url::fromRoute($firstOption->getRouteName(), $firstOption->getRouteParameters()),
+          'localized_options' => $pluginOptions,
         ],
-        '#access' => $firstOption['access_result'],
         '#weight' => $plugin->getWeight(),
       ];
     }
@@ -138,19 +160,9 @@ class LocalActionManager extends BaseManager
       '#theme' => "actionlink_dropdown_${type}",
       '#dropdown' => [
         'title' => $this->getTitle($plugin),
-        'options' => array_map(
-          function (array $option) use ($translationContext) {
-            unset($option['access_result']);
-
-            $option['title'] = $this->t($option['title'], [], ['context' => $translationContext]);
-
-            return $option;
-          },
-          $allowedOptions
-        ),
-        'localized_options' => $plugin->getOptions($this->routeMatch),
+        'options' => $options->untype()->map(fn (LocalActionOption $option) => $option->toArray(), $options)->toArray(),
+        'localized_options' => $pluginOptions,
       ],
-      '#access' => $firstOption['access_result'],
     ];
   }
 }

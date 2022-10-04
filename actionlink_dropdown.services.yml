@@ -1,4 +1,22 @@
 services:
+  actionlink_dropdown.options_factory.custom:
+    class: Drupal\actionlink_dropdown\Factory\CustomOptionsFactory
+    arguments: ['@access_manager']
+  actionlink_dropdown.options_factory:
+    class: Drupal\actionlink_dropdown\Factory\OptionsFactory
+    arguments: ['@actionlink_dropdown.options_factory.custom']
+
+  # Overrides
   plugin.manager.menu.local_action:
     class: Drupal\actionlink_dropdown\Menu\LocalActionManager
-    arguments: ['@http_kernel.controller.argument_resolver', '@request_stack', '@current_route_match', '@router.route_provider', '@module_handler', '@cache.discovery', '@language_manager', '@access_manager', '@current_user']
+    arguments: 
+      - '@http_kernel.controller.argument_resolver'
+      - '@request_stack'
+      - '@current_route_match'
+      - '@router.route_provider'
+      - '@module_handler'
+      - '@cache.discovery'
+      - '@language_manager'
+      - '@access_manager'
+      - '@current_user'
+      - '@actionlink_dropdown.options_factory'

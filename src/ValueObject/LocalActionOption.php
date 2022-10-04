@@ -31,4 +31,13 @@ class LocalActionOption
     {
         return $this->routeParameters;
     }
+
+    public function toArray(): array
+    {
+        return [
+            'title' => $this->getTitle(),
+            'route_name' => $this->getRouteName(),
+            'route_parameters' => $this->getRouteParameters(),
+        ];
+    }
 }

@@ -2,7 +2,7 @@
 
 namespace Drupal\actionlink_dropdown\Menu;
 
-use Drupal\actionlink_dropdown\Enum\LocalActionDropdownTypeEnum;
+use Drupal\actionlink_dropdown\Enum\LocalActionWidgetTypeEnum;
 use Drupal\actionlink_dropdown\Factory\OptionsFactory;
 use Drupal\actionlink_dropdown\ValueObject\LocalActionOption;
 use Drupal\Core\Menu\LocalActionManager as BaseManager;
@@ -102,9 +102,9 @@ class LocalActionManager extends BaseManager
     $options = $plugin->getOptions($this->routeMatch);
     $type = $options['widget'] ?? NULL;
     if (
-      $type === LocalActionDropdownTypeEnum::SELECT
-      || $type === LocalActionDropdownTypeEnum::DETAILS
-      || $type === LocalActionDropdownTypeEnum::DETAILS_PLUS_SELECT
+      $type === LocalActionWidgetTypeEnum::SELECT
+      || $type === LocalActionWidgetTypeEnum::DETAILS
+      || $type === LocalActionWidgetTypeEnum::DETAILS_PLUS_SELECT
     ) {
       return $this->createRenderElementForDropdownLink($plugin, $type);
     }

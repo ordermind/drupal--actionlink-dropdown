@@ -2,9 +2,12 @@ services:
   actionlink_dropdown.options_factory.custom:
     class: Drupal\actionlink_dropdown\Factory\CustomOptionsFactory
     arguments: ['@access_manager']
+  actionlink_dropdown.options_factory.entity_add:
+    class: Drupal\actionlink_dropdown\Factory\EntityAddOptionsFactory
+    arguments: ['@access_manager']
   actionlink_dropdown.options_factory:
     class: Drupal\actionlink_dropdown\Factory\OptionsFactory
-    arguments: ['@actionlink_dropdown.options_factory.custom']
+    arguments: ['@actionlink_dropdown.options_factory.custom', '@actionlink_dropdown.options_factory.entity_add']
 
   # Overrides
   plugin.manager.menu.local_action:

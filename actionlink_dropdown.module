@@ -5,7 +5,8 @@ use Drupal\Core\Url;
 /**
  * Implements hook_theme().
  */
-function actionlink_dropdown_theme() {
+function actionlink_dropdown_theme()
+{
   return [
     'actionlink_dropdown_select' => [
       'render element' => 'element',
@@ -22,34 +23,8 @@ function actionlink_dropdown_theme() {
 /**
  * Implements hook_preprocess_HOOK().
  */
-function actionlink_dropdown_preprocess_actionlink_dropdown_select(array &$variables) {
-  $dropdown = $variables['element']['#dropdown'];
-  $variables['dropdown'] = [
-    '#type' => 'select',
-    '#options' => ['' => $dropdown['title']],
-    '#attributes' => [
-      'class' => [
-        'button',
-        'button-action',
-        'button--primary',
-        'button--small',
-      ],
-      'onchange' => 'if(value) window.location.href = value; value = \'\';',
-    ],
-  ];
-  foreach ($dropdown['options'] as $option) {
-    $url = Url::fromRoute($option['route_name'], $option['route_parameters'] ?? [], $dropdown['localized_options'] ?? []);
-
-    $variables['dropdown']['#options'][$url->toString()] = $option['title'];
-  }
-
-  $variables['add_wrapper'] = empty($variables['element']['#skip_wrapper']);
-}
-
-/**
- * Implements hook_preprocess_HOOK().
- */
-function actionlink_dropdown_preprocess_actionlink_dropdown_details(array &$variables) {
+function actionlink_dropdown_preprocess_actionlink_dropdown_details(array &$variables)
+{
   $dropdown = $variables['element']['#dropdown'];
   $variables['dropdown'] = [
     '#type' => 'details',
@@ -86,7 +61,39 @@ function actionlink_dropdown_preprocess_actionlink_dropdown_details(array &$vari
 /**
  * Implements hook_preprocess_HOOK().
  */
-function actionlink_dropdown_preprocess_actionlink_dropdown_details_select(array &$variables) {
+function actionlink_dropdown_preprocess_actionlink_dropdown_select(array &$variables)
+{
+  $dropdown = $variables['element']['#dropdown'];
+  $variables['dropdown'] = [
+    '#type' => 'select',
+    '#options' => ['' => $dropdown['title']],
+    '#attributes' => [
+      'class' => [
+        'button',
+        'button-action',
+        'button--primary',
+        'button--small',
+      ],
+      'onchange' => 'if(value) window.location.href = value; value = \'\';',
+    ],
+    '#wrapper_attributes' => [
+      'class' => ['actionlink-dropdown-select-container'],
+    ],
+  ];
+  foreach ($dropdown['options'] as $option) {
+    $url = Url::fromRoute($option['route_name'], $option['route_parameters'] ?? [], $dropdown['localized_options'] ?? []);
+
+    $variables['dropdown']['#options'][$url->toString()] = $option['title'];
+  }
+
+  $variables['add_wrapper'] = empty($variables['element']['#skip_wrapper']);
+}
+
+/**
+ * Implements hook_preprocess_HOOK().
+ */
+function actionlink_dropdown_preprocess_actionlink_dropdown_details_select(array &$variables)
+{
   $variables['dropdown'] = [
     '#type' => 'container',
     '#attributes' => [
@@ -97,13 +104,11 @@ function actionlink_dropdown_preprocess_actionlink_dropdown_details_select(array
     'details' => [
       '#theme' => 'actionlink_dropdown_details',
       '#dropdown' => $variables['element']['#dropdown'],
-      '#access' => $variables['element']['#access'],
       '#skip_wrapper' => TRUE,
     ],
     'select' => [
       '#theme' => 'actionlink_dropdown_select',
       '#dropdown' => $variables['element']['#dropdown'],
-      '#access' => $variables['element']['#access'],
       '#skip_wrapper' => TRUE,
     ],
   ];

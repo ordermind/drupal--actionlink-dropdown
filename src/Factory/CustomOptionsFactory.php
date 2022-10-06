@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\actionlink_dropdown\Factory;
 
 use Drupal\actionlink_dropdown\Collection\LocalActionOptionCollection;
@@ -21,32 +23,32 @@ class CustomOptionsFactory {
 
   public function create(CustomLinksConfig $config, AccountInterface $account, string $translationContext): LocalActionOptionCollection {
     $options = new LocalActionOptionCollection(
-          $config
-            ->getLinks()
-            ->filter(
-                  fn (CustomLink $option) => $this->accessManager->checkNamedRoute(
-                      $option->getRouteName(),
-                      $option->getRouteParameters(),
-                      $account,
-                      FALSE
-                  )
-              )
-            ->untype()
-            ->map(
-                  fn (CustomLink $option) => new LocalActionOption(
-                      $this->t($option->getTitle(), [], ['context' => $translationContext]),
-                      $option->getRouteName(),
-                      $option->getRouteParameters()
-                  )
-              )
-            ->toArray()
-      );
+      $config
+        ->getLinks()
+        ->filter(
+          fn (CustomLink $option) => $this->accessManager->checkNamedRoute(
+            $option->getRouteName(),
+            $option->getRouteParameters(),
+            $account,
+            FALSE
+          )
+        )
+        ->untype()
+        ->map(
+          fn (CustomLink $option) => new LocalActionOption(
+            $this->t($option->getTitle(), [], ['context' => $translationContext]),
+            $option->getRouteName(),
+            $option->getRouteParameters()
+          )
+        )
+        ->toArray()
+    );
 
     return $this->insertFallbackTitlePrefixForSingleOption(
-          $options,
-          $config->getFallbackTitlePrefix(),
-          $translationContext
-      );
+      $options,
+      $config->getFallbackTitlePrefix(),
+      $translationContext
+    );
   }
 
 }

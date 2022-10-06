@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\actionlink_dropdown\Factory;
 
 use Drupal\actionlink_dropdown\Collection\LocalActionOptionCollection;
@@ -20,10 +22,10 @@ class EntityAddOptionsFactory {
   protected AccessManagerInterface $accessManager;
 
   public function __construct(
-        EntityTypeManagerInterface $entityTypeManager,
-        EntityTypeBundleInfoInterface $bundleInfo,
-        AccessManagerInterface $accessManager
-    ) {
+    EntityTypeManagerInterface $entityTypeManager,
+    EntityTypeBundleInfoInterface $bundleInfo,
+    AccessManagerInterface $accessManager
+  ) {
     $this->entityTypeManager = $entityTypeManager;
     $this->bundleInfo = $bundleInfo;
     $this->accessManager = $accessManager;
@@ -39,23 +41,23 @@ class EntityAddOptionsFactory {
     }
 
     $options = (new LocalActionOptionCollection(
-          array_map(fn (string $bundleId, array $bundleInfo) => new LocalActionOption(
-              Markup::create($bundleInfo['label']),
-              "entity.${entityTypeId}.add_form",
-              [$entityTypeDefinition->getBundleEntityType() => $bundleId]
-          ), array_keys($bundles), array_values($bundles))
-      ))->filter(fn (LocalActionOption $option) => $this->accessManager->checkNamedRoute(
-          $option->getRouteName(),
-          $option->getRouteParameters(),
-          $account,
-          FALSE
-      ));
+      array_map(fn (string $bundleId, array $bundleInfo) => new LocalActionOption(
+        Markup::create($bundleInfo['label']),
+        "entity.${entityTypeId}.add_form",
+        [$entityTypeDefinition->getBundleEntityType() => $bundleId]
+      ), array_keys($bundles), array_values($bundles))
+    ))->filter(fn (LocalActionOption $option) => $this->accessManager->checkNamedRoute(
+      $option->getRouteName(),
+      $option->getRouteParameters(),
+      $account,
+      FALSE
+    ));
 
     return $this->insertFallbackTitlePrefixForSingleOption(
-          $options,
-          $config->getFallbackTitlePrefix(),
-          $translationContext
-      );
+      $options,
+      $config->getFallbackTitlePrefix(),
+      $translationContext
+    );
   }
 
 }

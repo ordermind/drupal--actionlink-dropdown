@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\actionlink_dropdown\Factory;
 
 use Drupal\actionlink_dropdown\Collection\LocalActionOptionCollection;

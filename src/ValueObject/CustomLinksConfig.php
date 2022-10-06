@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\actionlink_dropdown\ValueObject;
 
 use Drupal\actionlink_dropdown\Collection\CustomLinkCollection;
@@ -22,11 +24,11 @@ class CustomLinksConfig implements LocalActionOptionsConfigInterface {
     }
 
     return new static(
-          new CustomLinkCollection(
-              array_map(fn (array $linkData) => CustomLink::fromArray($linkData), $config['custom_links'])
-          ),
-          (string) $config['fallback_title_prefix']
-      );
+      new CustomLinkCollection(
+        array_map(fn (array $linkData) => CustomLink::fromArray($linkData), $config['custom_links'])
+      ),
+      (string) $config['fallback_title_prefix']
+    );
   }
 
   public function getLinks(): CustomLinkCollection {

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\actionlink_dropdown\Factory\Concerns;
 
 use Drupal\actionlink_dropdown\Collection\LocalActionOptionCollection;
@@ -13,10 +15,10 @@ trait InsertsFallbackTitlePrefixForSingleOption {
    * If there is only one option, translate the fallback title prefix and insert it into the option label.
    */
   protected function insertFallbackTitlePrefixForSingleOption(
-        LocalActionOptionCollection $options,
-        string $fallbackTitlePrefix,
-        string $translationContext
-    ): LocalActionOptionCollection {
+    LocalActionOptionCollection $options,
+    string $fallbackTitlePrefix,
+    string $translationContext
+  ): LocalActionOptionCollection {
     if ($options->count() !== 1) {
       return $options;
     }
@@ -25,13 +27,13 @@ trait InsertsFallbackTitlePrefixForSingleOption {
     $firstOption = $options->firstOrFail();
     return new LocalActionOptionCollection([
       new LocalActionOption(
-              $this->t(
-                  "${fallbackTitlePrefix} @option",
-                  ['@option' => $firstOption->getTitle()],
-                  ['context' => $translationContext]
-              ),
-              $firstOption->getRouteName(),
-              $firstOption->getRouteParameters()
+        $this->t(
+          "${fallbackTitlePrefix} @option",
+          ['@option' => $firstOption->getTitle()],
+          ['context' => $translationContext]
+        ),
+        $firstOption->getRouteName(),
+        $firstOption->getRouteParameters()
       ),
     ]);
   }

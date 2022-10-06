@@ -37,5 +37,4 @@ class CustomLink {
   public function getRouteParameters(): array {
     return $this->routeParameters;
   }
-
 }

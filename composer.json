@@ -1,6 +1,6 @@
 {
     "name": "drupal/actionlink_dropdown",
-    "type": "drupal-module",
+    "type": "drupal-module--tengstrom",
     "require": {
         "gamez/typed-collection": "^5.2"
     }

@@ -42,30 +42,14 @@ class OptionsFactory
 
     protected function createCustomLinks(array $config, AccountInterface $account, string $translationContext): LocalActionOptionCollection
     {
-        if (empty($config['custom_links'])) {
-            throw new InvalidArgumentException('If custom links are used, the config array must include the key "custom_links"');
-        }
-        if (empty($config['fallback_title_prefix'])) {
-            throw new InvalidArgumentException('If custom links are used, the config array must include the key "fallback_title_prefix" which is used if there is only one link.');
-        }
-
-        $customLinksConfig = new CustomLinksConfig(
-            new CustomLinkCollection(
-                array_map(fn (array $linkData) => CustomLink::fromArray($linkData), $config['custom_links'])
-            ),
-            (string) $config['fallback_title_prefix']
-        );
+        $customLinksConfig = CustomLinksConfig::fromArray($config);
 
         return $this->customOptionsFactory->create($customLinksConfig, $account, $translationContext);
     }
 
     protected function createEntityAddLinks(array $config, AccountInterface $account, string $translationContext): LocalActionOptionCollection
     {
-        if (empty($config['entity_type'])) {
-            throw new InvalidArgumentException('If entity add links are used, the config array must include the key "entity_type"');
-        }
-
-        $entityAddConfig = new EntityAddConfig((string) $config['entity_type']);
+        $entityAddConfig = EntityAddConfig::fromArray($config);
 
         return $this->entityAddOptionsFactory->create($entityAddConfig, $account, $translationContext);
     }

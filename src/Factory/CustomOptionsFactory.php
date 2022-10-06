@@ -3,16 +3,16 @@
 namespace Drupal\actionlink_dropdown\Factory;
 
 use Drupal\actionlink_dropdown\Collection\LocalActionOptionCollection;
+use Drupal\actionlink_dropdown\Factory\Concerns\InsertsFallbackTitlePrefixForSingleOption;
 use Drupal\actionlink_dropdown\ValueObject\CustomLink;
 use Drupal\actionlink_dropdown\ValueObject\CustomLinksConfig;
 use Drupal\actionlink_dropdown\ValueObject\LocalActionOption;
 use Drupal\Core\Access\AccessManagerInterface;
 use Drupal\Core\Session\AccountInterface;
-use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 class CustomOptionsFactory
 {
-    use StringTranslationTrait;
+    use InsertsFallbackTitlePrefixForSingleOption;
 
     protected AccessManagerInterface $accessManager;
 
@@ -45,18 +45,10 @@ class CustomOptionsFactory
                 ->toArray()
         );
 
-        if ($options->count() === 1) {
-            /** @var LocalActionOption $firstOption */
-            $firstOption = $options->firstOrFail();
-            return new LocalActionOptionCollection([
-                new LocalActionOption(
-                    $this->t($config->getFallbackTitlePrefix() . ' @option', ['@option' => $firstOption->getTitle()], ['context' => $translationContext]),
-                    $firstOption->getRouteName(),
-                    $firstOption->getRouteParameters()
-                )
-            ]);
-        }
-
-        return $options;
+        return $this->insertFallbackTitlePrefixForSingleOption(
+            $options,
+            $config->getFallbackTitlePrefix(),
+            $translationContext
+        );
     }
 }

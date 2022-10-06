@@ -138,7 +138,7 @@ class LocalActionManager extends BaseManager
 
     $options = $this->optionsFactory->createOptions($pluginOptions, $this->account, $translationContext);
 
-    if (empty($options)) {
+    if ($options->isEmpty()) {
       return [];
     }
 
@@ -160,7 +160,7 @@ class LocalActionManager extends BaseManager
       '#theme' => "actionlink_dropdown_${type}",
       '#dropdown' => [
         'title' => $this->getTitle($plugin),
-        'options' => $options->untype()->map(fn (LocalActionOption $option) => $option->toArray(), $options)->toArray(),
+        'options' => $options->untype()->map(fn (LocalActionOption $option) => $option->toArray())->toArray(),
         'localized_options' => $pluginOptions,
       ],
     ];

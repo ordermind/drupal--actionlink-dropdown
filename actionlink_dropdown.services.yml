@@ -4,7 +4,10 @@ services:
     arguments: ['@access_manager']
   actionlink_dropdown.options_factory.entity_add:
     class: Drupal\actionlink_dropdown\Factory\EntityAddOptionsFactory
-    arguments: ['@access_manager']
+    arguments: 
+      - '@entity_type.manager'
+      - '@entity_type.bundle.info'
+      - '@access_manager'
   actionlink_dropdown.options_factory:
     class: Drupal\actionlink_dropdown\Factory\OptionsFactory
     arguments: ['@actionlink_dropdown.options_factory.custom', '@actionlink_dropdown.options_factory.entity_add']

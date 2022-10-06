@@ -1,4 +1,4 @@
-Adds support for displaying related local actions in a list widget.
+Adds support for displaying related local actions in a dropdown widget.
 
 Example config in <module_name>.links.action.yml:
 example_content.add:

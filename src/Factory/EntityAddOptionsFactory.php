@@ -12,51 +12,50 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Render\Markup;
 use Drupal\Core\Session\AccountInterface;
 
-class EntityAddOptionsFactory
-{
-    use InsertsFallbackTitlePrefixForSingleOption;
+class EntityAddOptionsFactory {
+  use InsertsFallbackTitlePrefixForSingleOption;
 
-    protected EntityTypeManagerInterface $entityTypeManager;
-    protected EntityTypeBundleInfoInterface $bundleInfo;
-    protected AccessManagerInterface $accessManager;
+  protected EntityTypeManagerInterface $entityTypeManager;
+  protected EntityTypeBundleInfoInterface $bundleInfo;
+  protected AccessManagerInterface $accessManager;
 
-    public function __construct(
+  public function __construct(
         EntityTypeManagerInterface $entityTypeManager,
         EntityTypeBundleInfoInterface $bundleInfo,
         AccessManagerInterface $accessManager
     ) {
-        $this->entityTypeManager = $entityTypeManager;
-        $this->bundleInfo = $bundleInfo;
-        $this->accessManager = $accessManager;
+    $this->entityTypeManager = $entityTypeManager;
+    $this->bundleInfo = $bundleInfo;
+    $this->accessManager = $accessManager;
+  }
+
+  public function create(EntityAddConfig $config, AccountInterface $account, string $translationContext): LocalActionOptionCollection {
+    $entityTypeId = $config->getEntityTypeId();
+    $entityTypeDefinition = $this->entityTypeManager->getDefinition($entityTypeId);
+    $bundles = $this->bundleInfo->getBundleInfo($entityTypeId);
+
+    if (empty($bundles)) {
+      return new LocalActionOptionCollection();
     }
 
-    public function create(EntityAddConfig $config, AccountInterface $account, string $translationContext): LocalActionOptionCollection
-    {
-        $entityTypeId = $config->getEntityTypeId();
-        $entityTypeDefinition = $this->entityTypeManager->getDefinition($entityTypeId);
-        $bundles = $this->bundleInfo->getBundleInfo($entityTypeId);
+    $options = (new LocalActionOptionCollection(
+          array_map(fn (string $bundleId, array $bundleInfo) => new LocalActionOption(
+              Markup::create($bundleInfo['label']),
+              "entity.${entityTypeId}.add_form",
+              [$entityTypeDefinition->getBundleEntityType() => $bundleId]
+          ), array_keys($bundles), array_values($bundles))
+      ))->filter(fn (LocalActionOption $option) => $this->accessManager->checkNamedRoute(
+          $option->getRouteName(),
+          $option->getRouteParameters(),
+          $account,
+          FALSE
+      ));
 
-        if (empty($bundles)) {
-            return new LocalActionOptionCollection();
-        }
+    return $this->insertFallbackTitlePrefixForSingleOption(
+          $options,
+          $config->getFallbackTitlePrefix(),
+          $translationContext
+      );
+  }
 
-        $options = (new LocalActionOptionCollection(
-            array_map(fn (string $bundleId, array $bundleInfo) => new LocalActionOption(
-                Markup::create($bundleInfo['label']),
-                "entity.${entityTypeId}.add_form",
-                [$entityTypeDefinition->getBundleEntityType() => $bundleId]
-            ), array_keys($bundles), array_values($bundles))
-        ))->filter(fn (LocalActionOption $option) => $this->accessManager->checkNamedRoute(
-            $option->getRouteName(),
-            $option->getRouteParameters(),
-            $account,
-            FALSE
-        ));
-
-        return $this->insertFallbackTitlePrefixForSingleOption(
-            $options,
-            $config->getFallbackTitlePrefix(),
-            $translationContext
-        );
-    }
 }

@@ -23,8 +23,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface;
 use Drupal\Core\Session\AccountInterface;
 
-class LocalActionManager extends BaseManager
-{
+class LocalActionManager extends BaseManager {
   use StringTranslationTrait;
 
   protected OptionsFactory $optionsFactory;
@@ -56,12 +55,10 @@ class LocalActionManager extends BaseManager
     $this->optionsFactory = $optionsFactory;
   }
 
-
   /**
    * {@inheritdoc}
    */
-  public function getActionsForRoute($route_appears)
-  {
+  public function getActionsForRoute($route_appears) {
     if (!isset($this->instances[$route_appears])) {
       $route_names = [];
       $this->instances[$route_appears] = [];
@@ -97,8 +94,7 @@ class LocalActionManager extends BaseManager
     return $links;
   }
 
-  protected function createRenderElement(LocalActionInterface $plugin): array
-  {
+  protected function createRenderElement(LocalActionInterface $plugin): array {
     $options = $plugin->getOptions($this->routeMatch);
     $type = $options['widget'] ?? NULL;
     if (
@@ -112,8 +108,7 @@ class LocalActionManager extends BaseManager
     return $this->createRenderElementForRegularLink($plugin);
   }
 
-  protected function createRenderElementForRegularLink(LocalActionInterface $plugin): array
-  {
+  protected function createRenderElementForRegularLink(LocalActionInterface $plugin): array {
     $route_name = $plugin->getRouteName();
     $route_parameters = $plugin->getRouteParameters($this->routeMatch);
     $access = $this->accessManager->checkNamedRoute($route_name, $route_parameters, $this->account, TRUE);
@@ -130,8 +125,7 @@ class LocalActionManager extends BaseManager
     ];
   }
 
-  protected function createRenderElementForDropdownLink(LocalActionInterface $plugin, string $type): array
-  {
+  protected function createRenderElementForDropdownLink(LocalActionInterface $plugin, string $type): array {
     $pluginOptions = $plugin->getOptions($this->routeMatch);
 
     $translationContext = $plugin->getPluginDefinition()['provider'];
@@ -143,7 +137,7 @@ class LocalActionManager extends BaseManager
     }
 
     if ($options->count() === 1) {
-      /** @var LocalActionOption $firstOption */
+      /** @var \Drupal\actionlink_dropdown\ValueObject\LocalActionOption $firstOption */
       $firstOption = $options->first();
       return [
         '#theme' => 'menu_local_action',
@@ -165,4 +159,5 @@ class LocalActionManager extends BaseManager
       ],
     ];
   }
+
 }

@@ -2,8 +2,7 @@
 
 namespace Drupal\actionlink_dropdown\Enum;
 
-class LocalActionWidgetTypeEnum
-{
+class LocalActionWidgetTypeEnum {
   /**
    * Displays the local actions in a select list, suitable for mobile layouts.
    */
@@ -18,4 +17,5 @@ class LocalActionWidgetTypeEnum
    * Displays the local actions in both a details element and a select list, for the purpose of responsive design.
    */
   const DETAILS_PLUS_SELECT = 'details_select';
+
 }

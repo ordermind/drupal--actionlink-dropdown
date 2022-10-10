@@ -12,6 +12,10 @@ services:
     class: Drupal\actionlink_dropdown\Factory\OptionsFactory
     arguments: ['@actionlink_dropdown.options_factory.custom', '@actionlink_dropdown.options_factory.entity_add']
 
+  actionlink_dropdown.renderer:
+    class: Drupal\actionlink_dropdown\Render\LocalActionRenderer
+    arguments: ['@actionlink_dropdown.options_factory', '@access_manager']
+
   # Overrides
   plugin.manager.menu.local_action:
     class: Drupal\actionlink_dropdown\Menu\LocalActionManager
@@ -25,4 +29,4 @@ services:
       - '@language_manager'
       - '@access_manager'
       - '@current_user'
-      - '@actionlink_dropdown.options_factory'
+      - '@actionlink_dropdown.renderer'

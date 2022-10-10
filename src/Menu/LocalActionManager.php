@@ -4,18 +4,12 @@ declare(strict_types=1);
 
 namespace Drupal\actionlink_dropdown\Menu;
 
-use Drupal\actionlink_dropdown\Enum\LocalActionWidgetTypeEnum;
 use Drupal\actionlink_dropdown\Factory\OptionsFactory;
-use Drupal\actionlink_dropdown\ValueObject\LocalActionOption;
+use Drupal\actionlink_dropdown\Render\LocalActionRenderer;
 use Drupal\Core\Menu\LocalActionManager as BaseManager;
-
 use Drupal\Core\Cache\CacheableMetadata;
-use Drupal\Core\Menu\LocalActionInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\Core\Url;
-
 use Drupal\Core\Access\AccessManagerInterface;
-use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
@@ -28,7 +22,7 @@ use Drupal\Core\Session\AccountInterface;
 class LocalActionManager extends BaseManager {
   use StringTranslationTrait;
 
-  protected OptionsFactory $optionsFactory;
+  protected LocalActionRenderer $renderer;
 
   public function __construct(
     ArgumentResolverInterface $argumentResolver,
@@ -40,7 +34,7 @@ class LocalActionManager extends BaseManager {
     LanguageManagerInterface $languageManager,
     AccessManagerInterface $accessManager,
     AccountInterface $account,
-    OptionsFactory $optionsFactory
+    LocalActionRenderer $renderer
   ) {
     parent::__construct(
       $argumentResolver,
@@ -54,11 +48,14 @@ class LocalActionManager extends BaseManager {
       $account
     );
 
-    $this->optionsFactory = $optionsFactory;
+    $this->renderer = $renderer;
   }
 
   /**
    * {@inheritdoc}
+   * 
+   * Based on Drupal\Core\Menu\LocalActionManager::getActionsForRoute(). I have simplified the caching a little bit which could potentially
+   * cause issues for different roles.
    */
   public function getActionsForRoute($route_appears) {
     if (!isset($this->instances[$route_appears])) {
@@ -83,83 +80,16 @@ class LocalActionManager extends BaseManager {
     $cacheability->addCacheContexts(['route']);
     /** @var \Drupal\Core\Menu\LocalActionInterface $plugin */
     foreach ($this->instances[$route_appears] as $plugin_id => $plugin) {
-      $renderArray = $this->createRenderElement($plugin);
+      $renderArray = $this->renderer->createRenderElement($plugin, $this->routeMatch, $this->account, $this->getTitle($plugin));
       if (!$renderArray) {
         continue;
       }
 
       $links[$plugin_id] = $renderArray;
-      $cacheability->addCacheableDependency(AccessResult::allowed())->addCacheableDependency($plugin);
+      $cacheability->addCacheableDependency($plugin);
     }
     $cacheability->applyTo($links);
 
     return $links;
   }
-
-  protected function createRenderElement(LocalActionInterface $plugin): array {
-    $options = $plugin->getOptions($this->routeMatch);
-    $type = $options['widget'] ?? NULL;
-    if (
-      $type === LocalActionWidgetTypeEnum::SELECT
-      || $type === LocalActionWidgetTypeEnum::DETAILS
-      || $type === LocalActionWidgetTypeEnum::DETAILS_PLUS_SELECT
-    ) {
-      return $this->createRenderElementForDropdownLink($plugin, $type);
-    }
-
-    return $this->createRenderElementForRegularLink($plugin);
-  }
-
-  protected function createRenderElementForRegularLink(LocalActionInterface $plugin): array {
-    $route_name = $plugin->getRouteName();
-    $route_parameters = $plugin->getRouteParameters($this->routeMatch);
-    $access = $this->accessManager->checkNamedRoute($route_name, $route_parameters, $this->account, TRUE);
-
-    return [
-      '#theme' => 'menu_local_action',
-      '#link' => [
-        'title' => $this->getTitle($plugin),
-        'url' => Url::fromRoute($route_name, $route_parameters),
-        'localized_options' => $plugin->getOptions($this->routeMatch),
-      ],
-      '#access' => $access,
-      '#weight' => $plugin->getWeight(),
-    ];
-  }
-
-  protected function createRenderElementForDropdownLink(LocalActionInterface $plugin, string $type): array {
-    $pluginOptions = $plugin->getOptions($this->routeMatch);
-
-    $translationContext = $plugin->getPluginDefinition()['provider'];
-
-    $options = $this->optionsFactory->createOptions($pluginOptions, $this->account, $translationContext);
-
-    if ($options->isEmpty()) {
-      return [];
-    }
-
-    if ($options->count() === 1) {
-      /** @var \Drupal\actionlink_dropdown\ValueObject\LocalActionOption $firstOption */
-      $firstOption = $options->first();
-      return [
-        '#theme' => 'menu_local_action',
-        '#link' => [
-          'title' => $firstOption->getTitle(),
-          'url' => Url::fromRoute($firstOption->getRouteName(), $firstOption->getRouteParameters()),
-          'localized_options' => $pluginOptions,
-        ],
-        '#weight' => $plugin->getWeight(),
-      ];
-    }
-
-    return [
-      '#theme' => "actionlink_dropdown_${type}",
-      '#dropdown' => [
-        'title' => $this->getTitle($plugin),
-        'options' => $options->untype()->map(fn (LocalActionOption $option) => $option->toArray())->toArray(),
-        'localized_options' => $pluginOptions,
-      ],
-    ];
-  }
-
 }

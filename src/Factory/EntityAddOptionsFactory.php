@@ -13,6 +13,7 @@ use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Render\Markup;
 use Drupal\Core\Session\AccountInterface;
+use LogicException;
 
 class EntityAddOptionsFactory {
   use InsertsFallbackTitlePrefixForSingleOption;
@@ -35,6 +36,10 @@ class EntityAddOptionsFactory {
     $entityTypeId = $config->getEntityTypeId();
     $entityTypeDefinition = $this->entityTypeManager->getDefinition($entityTypeId);
     $bundles = $this->bundleInfo->getBundleInfo($entityTypeId);
+    $bundleEntityTypeId = $entityTypeDefinition->getBundleEntityType();
+    if (!$bundleEntityTypeId) {
+      throw new LogicException("The entity type \"${entityTypeId}\" does not support bundles. Entity types without bundles are not supported for entity add links.");
+    }
 
     if (empty($bundles)) {
       return new LocalActionOptionCollection();
@@ -43,8 +48,8 @@ class EntityAddOptionsFactory {
     $options = (new LocalActionOptionCollection(
       array_map(fn (string $bundleId, array $bundleInfo) => new LocalActionOption(
         Markup::create($bundleInfo['label']),
-        "entity.${entityTypeId}.add_form",
-        [$entityTypeDefinition->getBundleEntityType() => $bundleId]
+        $this->getAddEntityRoute($entityTypeId),
+        [$bundleEntityTypeId => $bundleId]
       ), array_keys($bundles), array_values($bundles))
     ))->filter(fn (LocalActionOption $option) => $this->accessManager->checkNamedRoute(
       $option->getRouteName(),
@@ -60,4 +65,11 @@ class EntityAddOptionsFactory {
     );
   }
 
+  protected function getAddEntityRoute(string $entityTypeId): string {
+    if ($entityTypeId === 'node') {
+      return 'node.add';
+    }
+
+    return "entity.${entityTypeId}.add_form";
+  }
 }

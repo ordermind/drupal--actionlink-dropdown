@@ -53,9 +53,6 @@ class LocalActionManager extends BaseManager {
 
   /**
    * {@inheritdoc}
-   * 
-   * Based on Drupal\Core\Menu\LocalActionManager::getActionsForRoute(). I have simplified the caching a little bit which could potentially
-   * cause issues for different roles.
    */
   public function getActionsForRoute($route_appears) {
     if (!isset($this->instances[$route_appears])) {
@@ -86,10 +83,27 @@ class LocalActionManager extends BaseManager {
       }
 
       $links[$plugin_id] = $renderArray;
+
+      $this->addAccessCaching($renderArray, $cacheability);
       $cacheability->addCacheableDependency($plugin);
     }
     $cacheability->applyTo($links);
 
     return $links;
+  }
+
+  /**
+   * Adds access caching metadata not only for regular links but also for dropdown links.
+   */
+  protected function addAccessCaching(array &$renderArray, CacheableMetadata $cacheability): void {
+    $cacheability->addCacheableDependency($renderArray['#access']);
+
+    if (empty($renderArray['#dropdown'])) {
+      return;
+    }
+
+    foreach ($renderArray['#dropdown']['options'] as $option) {
+      $cacheability->addCacheableDependency($option['access']);
+    }
   }
 }

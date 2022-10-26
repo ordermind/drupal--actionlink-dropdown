@@ -88,10 +88,6 @@ class LocalActionRendererTest extends EntityKernelTestBase {
         $this->assertEquals($expected, $renderElement);
     }
 
-    /**
-     * @TODO:
-     *  - Add support for caching access check
-     */
     public function testEntityAddLinks(): void {
         $this->createContentType(['type' => 'bundle_1', 'name' => 'Bundle 1']);
         $this->createContentType(['type' => 'bundle_2', 'name' => 'Bundle 2']);
@@ -136,6 +132,7 @@ class LocalActionRendererTest extends EntityKernelTestBase {
                         'route_parameters' => [
                             'node_type' => 'bundle_1',
                         ],
+                        'access' => AccessResult::allowed()->addCacheContexts(['user.permissions']),
                     ],
                     [
                         'title' => Markup::create('Bundle 2'),
@@ -143,6 +140,7 @@ class LocalActionRendererTest extends EntityKernelTestBase {
                         'route_parameters' => [
                             'node_type' => 'bundle_2',
                         ],
+                        'access' => AccessResult::allowed()->addCacheContexts(['user.permissions']),
                     ],
                 ],
                 'localized_options' => [
@@ -154,6 +152,7 @@ class LocalActionRendererTest extends EntityKernelTestBase {
                     ],
                 ],
             ],
+            '#access' => AccessResult::allowed()->addCacheContexts(['user.permissions']),
             '#weight' => 5,
         ];
 

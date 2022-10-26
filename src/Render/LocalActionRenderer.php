@@ -4,14 +4,21 @@ declare(strict_types=1);
 
 namespace Drupal\actionlink_dropdown\Render;
 
+use Drupal\actionlink_dropdown\Collection\LocalActionOptionCollection;
 use Drupal\actionlink_dropdown\Enum\LocalActionWidgetTypeEnum;
 use Drupal\actionlink_dropdown\Factory\OptionsFactory;
 use Drupal\actionlink_dropdown\ValueObject\LocalActionOption;
 use Drupal\Core\Access\AccessManagerInterface;
+use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Access\AccessResultAllowed;
+use Drupal\Core\Access\AccessResultForbidden;
+use Drupal\Core\Access\AccessResultInterface;
+use Drupal\Core\Access\AccessResultNeutral;
 use Drupal\Core\Menu\LocalActionInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
+use LogicException;
 
 class LocalActionRenderer {
     protected OptionsFactory $optionsFactory;
@@ -92,6 +99,7 @@ class LocalActionRenderer {
                     'url' => Url::fromRoute($firstOption->getRouteName(), $firstOption->getRouteParameters()),
                     'localized_options' => $pluginOptions,
                 ],
+                '#access' => $firstOption->getAccessResult(),
                 '#weight' => $plugin->getWeight(),
             ];
         }
@@ -103,7 +111,43 @@ class LocalActionRenderer {
                 'options' => $localActionOptions->untype()->map(fn (LocalActionOption $option) => $option->toArray())->toArray(),
                 'localized_options' => $pluginOptions,
             ],
+            '#access' => $this->getDropdownAccess($localActionOptions),
             '#weight' => $plugin->getWeight(),
         ];
+    }
+
+    /**
+     * Creates a suitable access result based on the access results of the options.
+     */
+    protected function getDropdownAccess(LocalActionOptionCollection $localActionOptions): AccessResultInterface {
+        $accessHierarchy = [
+            AccessResultForbidden::class,
+            AccessResultNeutral::class,
+            AccessResultAllowed::class,
+        ];
+
+        /** @var AccessResultInterface $highestAccessResult */
+        $highestAccessResult = $localActionOptions->reduce(
+            function (AccessResultInterface $previous, LocalActionOption $option) use ($accessHierarchy) {
+                $accessResultClass = get_class($option->getAccessResult());
+                $accessWeight = array_search($accessResultClass, $accessHierarchy, TRUE);
+                if ($accessWeight === FALSE) {
+                    throw new LogicException('The access result class "' . $accessResultClass . '" is unknown');
+                }
+
+                /** @var int $highestAccessWeight */
+                $highestAccessWeight = array_search(get_class($previous), $accessHierarchy, TRUE);
+
+                /** @var int $accessWeight */
+                if ($accessWeight > $highestAccessWeight) {
+                    return $option->getAccessResult();
+                }
+
+                return $previous;
+            },
+            AccessResult::forbidden()
+        );
+
+        return $highestAccessResult;
     }
 }

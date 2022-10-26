@@ -9,5 +9,4 @@ use Gamez\Illuminate\Support\TypedCollection;
 
 class LocalActionOptionCollection extends TypedCollection {
   protected static $allowedTypes = [LocalActionOption::class];
-
 }

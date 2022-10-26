@@ -25,18 +25,16 @@ class CustomOptionsFactory {
     $options = new LocalActionOptionCollection(
       $config
         ->getLinks()
-        ->filter(
-          fn (CustomLink $option) => $this->accessManager->checkNamedRoute(
-            $option->getRouteName(),
-            $option->getRouteParameters(),
-            $account,
-            FALSE
-          )
-        )
         ->untype()
         ->map(
           fn (CustomLink $option) => new LocalActionOption(
             $this->t($option->getTitle(), [], ['context' => $translationContext]),
+            $this->accessManager->checkNamedRoute(
+              $option->getRouteName(),
+              $option->getRouteParameters(),
+              $account,
+              TRUE
+            ),
             $option->getRouteName(),
             $option->getRouteParameters()
           )
@@ -50,5 +48,4 @@ class CustomOptionsFactory {
       $translationContext
     );
   }
-
 }

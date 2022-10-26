@@ -46,16 +46,23 @@ class EntityAddOptionsFactory {
     }
 
     $options = (new LocalActionOptionCollection(
-      array_map(fn (string $bundleId, array $bundleInfo) => new LocalActionOption(
-        Markup::create($bundleInfo['label']),
-        $this->getAddEntityRoute($entityTypeId),
-        [$bundleEntityTypeId => $bundleId]
-      ), array_keys($bundles), array_values($bundles))
-    ))->filter(fn (LocalActionOption $option) => $this->accessManager->checkNamedRoute(
-      $option->getRouteName(),
-      $option->getRouteParameters(),
-      $account,
-      FALSE
+      array_map(function (string $bundleId, array $bundleInfo) use ($entityTypeId, $bundleEntityTypeId, $account) {
+        $routeName = $this->getAddEntityRoute($entityTypeId);
+        $routeParameters = [$bundleEntityTypeId => $bundleId];
+        $access = $this->accessManager->checkNamedRoute(
+          $routeName,
+          $routeParameters,
+          $account,
+          TRUE
+        );
+
+        return new LocalActionOption(
+          Markup::create($bundleInfo['label']),
+          $access,
+          $routeName,
+          $routeParameters
+        );
+      }, array_keys($bundles), array_values($bundles))
     ));
 
     return $this->insertFallbackTitlePrefixForSingleOption(

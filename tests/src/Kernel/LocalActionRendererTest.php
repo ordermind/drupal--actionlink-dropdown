@@ -90,7 +90,6 @@ class LocalActionRendererTest extends EntityKernelTestBase {
 
     /**
      * @TODO:
-     *  - Add support for weight
      *  - Add support for caching access check
      */
     public function testEntityAddLinks(): void {
@@ -100,7 +99,7 @@ class LocalActionRendererTest extends EntityKernelTestBase {
         $pluginDefinition = [
             'id' => 'entity_add_links',
             'title' => Markup::create('Add node'),
-            'weight' => null,
+            'weight' => 5,
             'route_name' => '<front>',
             'route_parameters' => [],
             'options' => [
@@ -155,6 +154,7 @@ class LocalActionRendererTest extends EntityKernelTestBase {
                     ],
                 ],
             ],
+            '#weight' => 5,
         ];
 
         $this->assertEquals($expected, $renderElement);

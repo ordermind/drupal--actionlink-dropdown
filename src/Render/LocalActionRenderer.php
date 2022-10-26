@@ -103,6 +103,7 @@ class LocalActionRenderer {
                 'options' => $localActionOptions->untype()->map(fn (LocalActionOption $option) => $option->toArray())->toArray(),
                 'localized_options' => $pluginOptions,
             ],
+            '#weight' => $plugin->getWeight(),
         ];
     }
 }

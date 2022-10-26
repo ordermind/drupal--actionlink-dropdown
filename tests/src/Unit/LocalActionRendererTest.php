@@ -6,9 +6,10 @@ namespace Drupal\Tests\actionlink_dropdown\Unit;
 
 use Drupal\actionlink_dropdown\Factory\OptionsFactory;
 use Drupal\actionlink_dropdown\Render\LocalActionRenderer;
+use Drupal\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Access\AccessManagerInterface;
 use Drupal\Core\Access\AccessResult;
-use Drupal\Core\Cache\CacheTagsInvalidatorInterface;
+use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
@@ -23,9 +24,15 @@ class LocalActionRendererTest extends UnitTestCase {
     protected function setUp(): void {
         parent::setUp();
 
-        $cacheTagsInvalidator = $this->prophesize(CacheTagsInvalidatorInterface::class)->reveal();
+        $mockCacheContextManager = $this->prophesize(CacheContextsManager::class);
+        $mockCacheContextManager->assertValidTokens(Argument::cetera())->willReturn(TRUE);
+        $cacheContextManager = $mockCacheContextManager->reveal();
 
-        $this->getContainerWithCacheTagsInvalidator($cacheTagsInvalidator);
+        $mockContainer = $this->prophesize(ContainerInterface::class);
+        $mockContainer->get('cache_contexts_manager')->willReturn($cacheContextManager);
+        $container = $mockContainer->reveal();
+
+        \Drupal::setContainer($container);
     }
 
     public function testRegularLink(): void {

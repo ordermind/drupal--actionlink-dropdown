@@ -17,7 +17,7 @@ class CustomLinksConfig implements LocalActionOptionsConfigInterface {
 
   public static function fromArray(array $config): static {
     if (empty($config['custom_links'])) {
-      throw new \InvalidArgumentException('The config array must include the key "custom_links"');
+      throw new \InvalidArgumentException('The config array must include the key "custom_links" and not have an empty value');
     }
     if (empty($config['fallback_title_prefix'])) {
       throw new \InvalidArgumentException('The config array must include the key "fallback_title_prefix" which is used if there is only one link.');
@@ -41,5 +41,4 @@ class CustomLinksConfig implements LocalActionOptionsConfigInterface {
   public function getFallbackTitlePrefix(): string {
     return $this->fallbackTitlePrefix;
   }
-
 }

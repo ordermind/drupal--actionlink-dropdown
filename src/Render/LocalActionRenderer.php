@@ -95,7 +95,7 @@ class LocalActionRenderer {
             return [
                 '#theme' => 'menu_local_action',
                 '#link' => [
-                    'title' => $firstOption->getTitle(),
+                    'title' => $firstOption->getTitle(), // The title is already modified to use the fallback title prefix
                     'url' => Url::fromRoute($firstOption->getRouteName(), $firstOption->getRouteParameters()),
                     'localized_options' => $pluginOptions,
                 ],

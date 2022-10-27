@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Tests\actionlink_dropdown\Kernel;
+namespace Drupal\Tests\actionlink_dropdown\Kernel\Render;
 
 use Drupal\actionlink_dropdown\Render\LocalActionRenderer;
 use Drupal\Core\Access\AccessResult;
@@ -88,7 +88,68 @@ class LocalActionRendererTest extends EntityKernelTestBase {
         $this->assertEquals($expected, $renderElement);
     }
 
-    public function testEntityAddLinks(): void {
+    public function testSingleCustomLink(): void {
+        $pluginDefinition = [
+            'id' => 'entity_add_links',
+            'title' => Markup::create('Go to link'),
+            'weight' => 5,
+            'route_name' => '<front>',
+            'route_parameters' => [],
+            'options' => [
+                'widget' => 'details',
+                'links' => 'custom',
+                'custom_links' => [
+                    [
+                        'title' => 'Test link',
+                        'route_name' => 'user.admin_index',
+                        'route_parameters' => [],
+                    ],
+                ],
+                'fallback_title_prefix' => 'Go to',
+            ],
+            'appears_on' => ['<front>'],
+            'class' => 'Drupal\menu_ui\Plugin\Menu\LocalAction\MenuLinkAdd',
+            'provider' => 'test_provider',
+        ];
+
+        $redirectDestination = new RedirectDestination($this->requestStack, $this->urlGenerator);
+        $localAction = new MenuLinkAdd([], $pluginDefinition['id'], $pluginDefinition, $this->routeProvider, $redirectDestination);
+
+        /** @var User $user */
+        $user = User::load(1);
+
+        $renderElement = $this->localActionRenderer->createRenderElement(
+            $localAction,
+            $this->routeMatch,
+            $user,
+            $pluginDefinition['title']->__toString()
+        );
+
+        $expected = [
+            '#theme' => 'menu_local_action',
+            '#link' => [
+                'title' => 'Go to Test link',
+                'url' => Url::fromRoute(
+                    $pluginDefinition['options']['custom_links'][0]['route_name'],
+                    $pluginDefinition['options']['custom_links'][0]['route_parameters'],
+                ),
+                'localized_options' => array_merge(
+                    $pluginDefinition['options'],
+                    [
+                        'query' => [
+                            'destination' => '/',
+                        ],
+                    ]
+                )
+            ],
+            '#access' => AccessResult::allowed()->addCacheContexts(['user.permissions']),
+            '#weight' => 5,
+        ];
+
+        $this->assertEquals($expected, $renderElement);
+    }
+
+    public function testMultipleEntityAddLinks(): void {
         $this->createContentType(['type' => 'bundle_1', 'name' => 'Bundle 1']);
         $this->createContentType(['type' => 'bundle_2', 'name' => 'Bundle 2']);
 

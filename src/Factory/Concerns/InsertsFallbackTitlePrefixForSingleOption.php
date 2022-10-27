@@ -32,10 +32,10 @@ trait InsertsFallbackTitlePrefixForSingleOption {
           ['@option' => $firstOption->getTitle()],
           ['context' => $translationContext]
         ),
+        $firstOption->getAccessResult(),
         $firstOption->getRouteName(),
         $firstOption->getRouteParameters()
       ),
     ]);
   }
-
 }

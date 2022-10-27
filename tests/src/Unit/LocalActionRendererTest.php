@@ -8,7 +8,9 @@ use Drupal\actionlink_dropdown\Factory\OptionsFactory;
 use Drupal\actionlink_dropdown\Render\LocalActionRenderer;
 use Drupal\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Access\AccessManagerInterface;
-use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Access\AccessResultAllowed;
+use Drupal\Core\Access\AccessResultForbidden;
+use Drupal\Core\Access\AccessResultNeutral;
 use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Session\AccountInterface;
@@ -35,12 +37,17 @@ class LocalActionRendererTest extends UnitTestCase {
         \Drupal::setContainer($container);
     }
 
-    public function testRegularLink(): void {
+    /**
+     * @dataProvider regularLinkProvider
+     */
+    public function testRegularLink(string $expectedAccessResultClass): void {
+        $expectedAccessResult = (new $expectedAccessResultClass())->addCacheContexts(['user.permissions']);
+
         $mockOptionsFactory = $this->prophesize(OptionsFactory::class);
         $optionsFactory = $mockOptionsFactory->reveal();
 
         $mockAccessManager = $this->prophesize(AccessManagerInterface::class);
-        $mockAccessManager->checkNamedRoute(Argument::cetera())->willReturn(AccessResult::allowed()->addCacheContexts(['user.permissions']));
+        $mockAccessManager->checkNamedRoute(Argument::cetera())->willReturn($expectedAccessResult);
         $accessManager = $mockAccessManager->reveal();
 
         $mockLocalAction = $this->prophesize(MenuLinkAdd::class);
@@ -80,10 +87,18 @@ class LocalActionRendererTest extends UnitTestCase {
                     ],
                 ],
             ],
-            '#access' => AccessResult::allowed()->addCacheContexts(['user.permissions']),
+            '#access' => $expectedAccessResult,
             '#weight' => null,
         ];
 
         $this->assertEquals($expected, $renderElement);
+    }
+
+    public function regularLinkProvider(): array {
+        return [
+            [AccessResultForbidden::class],
+            [AccessResultNeutral::class],
+            [AccessResultAllowed::class],
+        ];
     }
 }

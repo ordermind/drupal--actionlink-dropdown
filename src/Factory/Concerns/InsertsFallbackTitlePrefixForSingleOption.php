@@ -16,9 +16,13 @@ trait InsertsFallbackTitlePrefixForSingleOption {
    */
   protected function insertFallbackTitlePrefixForSingleOption(
     LocalActionOptionCollection $options,
-    string $fallbackTitlePrefix,
+    ?string $fallbackTitlePrefix,
     string $translationContext
   ): LocalActionOptionCollection {
+    if (empty($fallbackTitlePrefix)) {
+      return $options;
+    }
+
     if ($options->count() !== 1) {
       return $options;
     }

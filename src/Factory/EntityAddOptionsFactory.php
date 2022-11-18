@@ -35,12 +35,12 @@ class EntityAddOptionsFactory {
   public function create(EntityAddConfig $config, AccountInterface $account, string $translationContext): LocalActionOptionCollection {
     $entityTypeId = $config->getEntityTypeId();
     $entityTypeDefinition = $this->entityTypeManager->getDefinition($entityTypeId);
-    $bundles = $this->bundleInfo->getBundleInfo($entityTypeId);
     $bundleEntityTypeId = $entityTypeDefinition->getBundleEntityType();
     if (!$bundleEntityTypeId) {
       throw new LogicException("The entity type \"${entityTypeId}\" does not support bundles. Entity types without bundles are not supported for entity add links.");
     }
 
+    $bundles = $this->bundleInfo->getBundleInfo($entityTypeId);
     if (empty($bundles)) {
       return new LocalActionOptionCollection();
     }

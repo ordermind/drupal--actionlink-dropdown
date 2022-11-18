@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Drupal\actionlink_dropdown\Menu;
 
+use Drupal\actionlink_dropdown\Factory\CacheableLocalActionLinksFactory;
 use Drupal\actionlink_dropdown\Factory\OptionsFactory;
 use Drupal\actionlink_dropdown\Render\LocalActionRenderer;
+use Drupal\actionlink_dropdown\ValueObject\LocalizedLocalActionDecorator;
 use Drupal\Core\Menu\LocalActionManager as BaseManager;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
@@ -13,6 +15,7 @@ use Drupal\Core\Access\AccessManagerInterface;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
+use Drupal\Core\Menu\LocalActionInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Routing\RouteProviderInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -22,7 +25,7 @@ use Drupal\Core\Session\AccountInterface;
 class LocalActionManager extends BaseManager {
   use StringTranslationTrait;
 
-  protected LocalActionRenderer $renderer;
+  protected CacheableLocalActionLinksFactory $actionLinksFactory;
 
   public function __construct(
     ArgumentResolverInterface $argumentResolver,
@@ -34,7 +37,7 @@ class LocalActionManager extends BaseManager {
     LanguageManagerInterface $languageManager,
     AccessManagerInterface $accessManager,
     AccountInterface $account,
-    LocalActionRenderer $renderer
+    CacheableLocalActionLinksFactory $actionLinksFactory
   ) {
     parent::__construct(
       $argumentResolver,
@@ -48,7 +51,7 @@ class LocalActionManager extends BaseManager {
       $account
     );
 
-    $this->renderer = $renderer;
+    $this->actionLinksFactory = $actionLinksFactory;
   }
 
   /**
@@ -72,24 +75,24 @@ class LocalActionManager extends BaseManager {
         $this->routeProvider->getRoutesByNames($route_names);
       }
     }
-    $links = [];
-    $cacheability = new CacheableMetadata();
-    $cacheability->addCacheContexts(['route']);
-    /** @var \Drupal\Core\Menu\LocalActionInterface $plugin */
-    foreach ($this->instances[$route_appears] as $plugin_id => $plugin) {
-      $renderArray = $this->renderer->createRenderElement($plugin, $this->routeMatch, $this->account, $this->getTitle($plugin));
-      if (!$renderArray) {
-        continue;
-      }
 
-      $links[$plugin_id] = $renderArray;
+    /** @var LocalActionInterface[] $relevantInstances */
+    $relevantInstances = $this->instances[$route_appears];
 
-      $this->addAccessCaching($renderArray, $cacheability);
-      $cacheability->addCacheableDependency($plugin);
-    }
-    $cacheability->applyTo($links);
+    /** @var LocalizedLocalActionDecorator[] $localizedLocalActions */
+    $localizedLocalActions = array_map(
+      function (string $pluginId, LocalActionInterface $plugin): LocalizedLocalActionDecorator {
+        return new LocalizedLocalActionDecorator($pluginId, $plugin, $this->getTitle($plugin));
+      },
+      array_keys($relevantInstances),
+      array_values($relevantInstances)
+    );
 
-    return $links;
+    return $this->actionLinksFactory->createFromLocalizedLocalActions(
+      $this->routeMatch,
+      $this->account,
+      ...$localizedLocalActions
+    );
   }
 
   /**

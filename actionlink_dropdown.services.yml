@@ -11,6 +11,9 @@ services:
   actionlink_dropdown.options_factory:
     class: Drupal\actionlink_dropdown\Factory\OptionsFactory
     arguments: ['@actionlink_dropdown.options_factory.custom', '@actionlink_dropdown.options_factory.entity_add']
+  actionlink_dropdown.local_action_links_factory:
+    class: Drupal\actionlink_dropdown\Factory\CacheableLocalActionLinksFactory
+    arguments: ['@actionlink_dropdown.renderer']
 
   actionlink_dropdown.renderer:
     class: Drupal\actionlink_dropdown\Render\LocalActionRenderer
@@ -29,4 +32,4 @@ services:
       - '@language_manager'
       - '@access_manager'
       - '@current_user'
-      - '@actionlink_dropdown.renderer'
+      - '@actionlink_dropdown.local_action_links_factory'

@@ -14,7 +14,7 @@ use Drupal\Core\Access\AccessResultAllowed;
 use Drupal\Core\Access\AccessResultForbidden;
 use Drupal\Core\Access\AccessResultInterface;
 use Drupal\Core\Access\AccessResultNeutral;
-use Drupal\Core\Menu\LocalActionInterface;
+use Drupal\Core\Menu\LocalActionDefault;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
@@ -33,7 +33,7 @@ class LocalActionRenderer {
     }
 
     public function createRenderElement(
-        LocalActionInterface $plugin,
+        LocalActionDefault $plugin,
         RouteMatchInterface $routeMatch,
         AccountInterface $account,
         string $title
@@ -52,7 +52,7 @@ class LocalActionRenderer {
     }
 
     protected function createRenderElementForRegularLink(
-        LocalActionInterface $plugin,
+        LocalActionDefault $plugin,
         array $pluginOptions,
         RouteMatchInterface $routeMatch,
         AccountInterface $account,
@@ -75,7 +75,7 @@ class LocalActionRenderer {
     }
 
     protected function createRenderElementForDropdownLink(
-        LocalActionInterface $plugin,
+        LocalActionDefault $plugin,
         string $type,
         array $pluginOptions,
         AccountInterface $account,

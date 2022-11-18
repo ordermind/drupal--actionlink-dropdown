@@ -7,6 +7,10 @@ namespace Drupal\actionlink_dropdown\ValueObject;
 use Drupal\actionlink_dropdown\Concerns\DecoratesObject;
 use Drupal\Core\Menu\LocalActionDefault;
 
+/**
+ * @mixin LocalActionDefault
+ * @method LocalActionDefault getDecoratedObject
+ */
 class LocalizedLocalActionDecorator {
     use DecoratesObject;
 

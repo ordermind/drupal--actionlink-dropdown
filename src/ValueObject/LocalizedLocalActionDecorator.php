@@ -7,21 +7,15 @@ namespace Drupal\actionlink_dropdown\ValueObject;
 use Drupal\actionlink_dropdown\Concerns\DecoratesObject;
 use Drupal\Core\Menu\LocalActionDefault;
 
-class LocalizedLocalActionDecorator extends LocalActionDefault {
+class LocalizedLocalActionDecorator {
     use DecoratesObject;
 
-    protected string $identifier;
     protected LocalActionDefault $plugin;
     protected string $localizedTitle;
 
-    public function __construct(string $identifier, LocalActionDefault $plugin, string $localizedTitle) {
-        $this->identifier = $identifier;
-        $this->plugin = $plugin;
+    public function __construct(LocalActionDefault $plugin, string $localizedTitle) {
+        $this->decoratedObject = $plugin;
         $this->localizedTitle = $localizedTitle;
-    }
-
-    public function getIdentifier(): string {
-        return $this->identifier;
     }
 
     public function getLocalizedTitle(): string {

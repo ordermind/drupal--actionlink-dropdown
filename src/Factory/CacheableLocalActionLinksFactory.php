@@ -28,16 +28,21 @@ class CacheableLocalActionLinksFactory {
         $links = [];
         $cacheability = new CacheableMetadata();
         $cacheability->addCacheContexts(['route']);
-        foreach ($localActions as $plugin) {
-            $renderArray = $this->renderer->createRenderElement($plugin, $routeMatch, $account, $plugin->getLocalizedTitle());
+        foreach ($localActions as $decoratedPlugin) {
+            $renderArray = $this->renderer->createRenderElement(
+                $decoratedPlugin->getDecoratedObject(),
+                $routeMatch,
+                $account,
+                $decoratedPlugin->getLocalizedTitle()
+            );
             if (!$renderArray) {
                 continue;
             }
 
-            $links[$plugin->getIdentifier()] = $renderArray;
+            $links[$decoratedPlugin->getPluginId()] = $renderArray;
 
             $this->addAccessCaching($renderArray, $cacheability);
-            $cacheability->addCacheableDependency($plugin);
+            $cacheability->addCacheableDependency($decoratedPlugin);
         }
         $cacheability->applyTo($links);
 

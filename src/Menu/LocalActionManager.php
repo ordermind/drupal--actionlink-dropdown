@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Drupal\actionlink_dropdown\Menu;
 
 use Drupal\actionlink_dropdown\Factory\CacheableLocalActionLinksFactory;
-use Drupal\actionlink_dropdown\Factory\OptionsFactory;
-use Drupal\actionlink_dropdown\Render\LocalActionRenderer;
 use Drupal\actionlink_dropdown\ValueObject\LocalizedLocalActionDecorator;
 use Drupal\Core\Menu\LocalActionManager as BaseManager;
 use Drupal\Core\Cache\CacheableMetadata;
@@ -81,10 +79,9 @@ class LocalActionManager extends BaseManager {
 
     /** @var LocalizedLocalActionDecorator[] $localizedLocalActions */
     $localizedLocalActions = array_map(
-      function (string $pluginId, LocalActionInterface $plugin): LocalizedLocalActionDecorator {
-        return new LocalizedLocalActionDecorator($pluginId, $plugin, $this->getTitle($plugin));
+      function (LocalActionInterface $plugin): LocalizedLocalActionDecorator {
+        return new LocalizedLocalActionDecorator($plugin, $this->getTitle($plugin));
       },
-      array_keys($relevantInstances),
       array_values($relevantInstances)
     );
 

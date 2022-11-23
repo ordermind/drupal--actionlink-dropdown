@@ -14,7 +14,6 @@ use Ordermind\Helpers\Decorator\DecoratesObjectTrait;
 class LocalizedLocalActionDecorator {
     use DecoratesObjectTrait;
 
-    protected LocalActionDefault $plugin;
     protected string $localizedTitle;
 
     public function __construct(LocalActionDefault $plugin, string $localizedTitle) {

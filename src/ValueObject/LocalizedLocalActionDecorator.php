@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace Drupal\actionlink_dropdown\ValueObject;
 
-use Drupal\actionlink_dropdown\Concerns\DecoratesObject;
 use Drupal\Core\Menu\LocalActionDefault;
+use Ordermind\Helpers\Decorator\DecoratesObjectTrait;
 
 /**
  * @mixin LocalActionDefault
  * @method LocalActionDefault getDecoratedObject
  */
 class LocalizedLocalActionDecorator {
-    use DecoratesObject;
+    use DecoratesObjectTrait;
 
     protected LocalActionDefault $plugin;
     protected string $localizedTitle;

@@ -53,8 +53,9 @@ class LocalActionManager extends BaseManager {
 
   /**
    * {@inheritdoc}
-   * 
-   * Changes the parent method to delegate the creation of the render arrays to an external service.
+   *
+   * Changes the parent method to delegate the creation of the render
+   * arrays to an external service.
    */
   public function getActionsForRoute($route_appears) {
     if (!isset($this->instances[$route_appears])) {
@@ -79,10 +80,10 @@ class LocalActionManager extends BaseManager {
   }
 
   protected function createRenderArrays(string $route_appears): array {
-    /** @var LocalActionInterface[] $relevantInstances */
+    /** @var \Drupal\Core\Menu\LocalActionInterface[] $relevantInstances */
     $relevantInstances = $this->instances[$route_appears];
 
-    /** @var LocalizedLocalActionDecorator[] $localizedLocalActions */
+    /** @var \Drupal\actionlink_dropdown\ValueObject\LocalizedLocalActionDecorator[] $localizedLocalActions */
     $localizedLocalActions = array_map(
       function (LocalActionInterface $plugin): LocalizedLocalActionDecorator {
         return new LocalizedLocalActionDecorator($plugin, $this->getTitle($plugin));
@@ -96,4 +97,5 @@ class LocalActionManager extends BaseManager {
       ...$localizedLocalActions
     );
   }
+
 }

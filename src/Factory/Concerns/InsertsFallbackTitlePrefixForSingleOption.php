@@ -12,7 +12,8 @@ trait InsertsFallbackTitlePrefixForSingleOption {
   use StringTranslationTrait;
 
   /**
-   * If there is only one option, translate the fallback title prefix and insert it into the option label.
+   * If there is only one option, translate the fallback title prefix
+   * and insert it into the option label.
    */
   protected function insertFallbackTitlePrefixForSingleOption(
     LocalActionOptionCollection $options,
@@ -42,4 +43,5 @@ trait InsertsFallbackTitlePrefixForSingleOption {
       ),
     ]);
   }
+
 }

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\actionlink_dropdown\ValueObject;
 
 use Drupal\actionlink_dropdown\Collection\CustomLinkCollection;
-use InvalidArgumentException;
 
 class CustomLinksConfig implements LocalActionOptionsConfigInterface {
   protected CustomLinkCollection $links;
@@ -18,11 +17,11 @@ class CustomLinksConfig implements LocalActionOptionsConfigInterface {
 
   public static function fromArray(array $config): static {
     if (empty($config['custom_links'])) {
-      throw new InvalidArgumentException('The config array must contain a value for the key "custom_links"');
+      throw new \InvalidArgumentException('The config array must contain a value for the key "custom_links"');
     }
 
     if (!is_array($config['custom_links'])) {
-      throw new InvalidArgumentException('The value for the key "custom_links" must be an array');
+      throw new \InvalidArgumentException('The value for the key "custom_links" must be an array');
     }
 
     $links = new CustomLinkCollection(
@@ -34,7 +33,7 @@ class CustomLinksConfig implements LocalActionOptionsConfigInterface {
     }
 
     if (!is_string($config['fallback_title_prefix'])) {
-      throw new InvalidArgumentException('The value for the key "fallback_title_prefix" must be a string');
+      throw new \InvalidArgumentException('The value for the key "fallback_title_prefix" must be a string');
     }
 
     return new static($links, $config['fallback_title_prefix']);
@@ -50,4 +49,5 @@ class CustomLinksConfig implements LocalActionOptionsConfigInterface {
   public function getFallbackTitlePrefix(): ?string {
     return $this->fallbackTitlePrefix;
   }
+
 }

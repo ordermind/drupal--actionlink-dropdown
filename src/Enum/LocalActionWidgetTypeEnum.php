@@ -16,7 +16,8 @@ class LocalActionWidgetTypeEnum {
   const DETAILS = 'details';
 
   /**
-   * Displays the local actions in both a details element and a select list, for the purpose of responsive design.
+   * Displays the local actions in both a details element and a select list,
+   * for the purpose of responsive design.
    */
   const DETAILS_PLUS_SELECT = 'details_select';
 

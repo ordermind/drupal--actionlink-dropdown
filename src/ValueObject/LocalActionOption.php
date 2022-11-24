@@ -44,4 +44,5 @@ class LocalActionOption {
       'route_parameters' => $this->getRouteParameters(),
     ];
   }
+
 }

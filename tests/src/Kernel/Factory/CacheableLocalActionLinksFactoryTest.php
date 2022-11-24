@@ -22,232 +22,233 @@ use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
 use Drupal\user\Entity\User;
 
 class CacheableLocalActionLinksFactoryTest extends EntityKernelTestBase {
-    use OverridesRequestStack;
-    use ContentTypeCreationTrait;
+  use OverridesRequestStack;
+  use ContentTypeCreationTrait;
 
-    protected CacheableLocalActionLinksFactory $factory;
-    protected LocalActionRenderer $localActionRenderer;
-    protected RouteProviderInterface $routeProvider;
-    protected UrlGeneratorInterface $urlGenerator;
-    protected RequestStack $requestStack;
-    protected RouteMatchInterface $routeMatch;
+  protected CacheableLocalActionLinksFactory $factory;
+  protected LocalActionRenderer $localActionRenderer;
+  protected RouteProviderInterface $routeProvider;
+  protected UrlGeneratorInterface $urlGenerator;
+  protected RequestStack $requestStack;
+  protected RouteMatchInterface $routeMatch;
 
-    protected function setUp(): void {
-        parent::setUp();
+  protected function setUp(): void {
+    parent::setUp();
 
-        $this->requestStack = $this->createRequestStack();
+    $this->requestStack = $this->createRequestStack();
 
-        $this->enableModules(['node', 'actionlink_dropdown']);
-        $this->installConfig(['node']);
-        $this->setUpCurrentUser(['uid' => 1]);
+    $this->enableModules(['node', 'actionlink_dropdown']);
+    $this->installConfig(['node']);
+    $this->setUpCurrentUser(['uid' => 1]);
 
-        $this->factory = \Drupal::service('actionlink_dropdown.local_action_links_factory');
-        $this->localActionRenderer = \Drupal::service('actionlink_dropdown.renderer');
-        $this->routeMatch = \Drupal::service('current_route_match');
-        $this->routeProvider = \Drupal::service('router.route_provider');
-        $this->urlGenerator = \Drupal::service('url_generator');
-    }
+    $this->factory = \Drupal::service('actionlink_dropdown.local_action_links_factory');
+    $this->localActionRenderer = \Drupal::service('actionlink_dropdown.renderer');
+    $this->routeMatch = \Drupal::service('current_route_match');
+    $this->routeProvider = \Drupal::service('router.route_provider');
+    $this->urlGenerator = \Drupal::service('url_generator');
+  }
 
-    public function testRegularLink(): void {
-        $pluginDefinition = [
-            'id' => 'test_link',
-            'title' => Markup::create('Test link'),
-            'weight' => null,
-            'route_name' => 'user.admin_index',
-            'route_parameters' => [],
-            'options' => [],
-            'appears_on' => ['<front>'],
-            'class' => 'Drupal\menu_ui\Plugin\Menu\LocalAction\MenuLinkAdd',
-            'provider' => 'test_provider',
-        ];
+  public function testRegularLink(): void {
+    $pluginDefinition = [
+      'id' => 'test_link',
+      'title' => Markup::create('Test link'),
+      'weight' => NULL,
+      'route_name' => 'user.admin_index',
+      'route_parameters' => [],
+      'options' => [],
+      'appears_on' => ['<front>'],
+      'class' => 'Drupal\menu_ui\Plugin\Menu\LocalAction\MenuLinkAdd',
+      'provider' => 'test_provider',
+    ];
 
-        $redirectDestination = new RedirectDestination($this->requestStack, $this->urlGenerator);
-        $localAction = new MenuLinkAdd([], $pluginDefinition['id'], $pluginDefinition, $this->routeProvider, $redirectDestination);
+    $redirectDestination = new RedirectDestination($this->requestStack, $this->urlGenerator);
+    $localAction = new MenuLinkAdd([], $pluginDefinition['id'], $pluginDefinition, $this->routeProvider, $redirectDestination);
 
-        /** @var User $user */
-        $user = User::load(1);
+    /** @var \Drupal\user\Entity\User $user */
+    $user = User::load(1);
 
-        $renderElement = $this->factory->createFromLocalizedLocalActions(
-            $this->routeMatch,
-            $user,
-            new LocalizedLocalActionDecorator($localAction, $pluginDefinition['title']->__toString()),
-        );
+    $renderElement = $this->factory->createFromLocalizedLocalActions(
+          $this->routeMatch,
+          $user,
+          new LocalizedLocalActionDecorator($localAction, $pluginDefinition['title']->__toString()),
+      );
 
-        $expected = [
-            'test_link' => [
-                '#theme' => 'menu_local_action',
-                '#link' => [
+    $expected = [
+      'test_link' => [
+        '#theme' => 'menu_local_action',
+        '#link' => [
+          'title' => 'Test link',
+          'url' => Url::fromRoute($localAction->getRouteName(), $localAction->getRouteParameters($this->routeMatch)),
+          'localized_options' => [
+            'query' => [
+              'destination' => '/',
+            ],
+          ],
+        ],
+        '#access' => AccessResult::allowed()->addCacheContexts(['user.permissions']),
+        '#weight' => NULL,
+      ],
+      '#cache' => [
+        'contexts' => [
+          'route',
+          'user.permissions',
+        ],
+        'tags' => [],
+        'max-age' => 0,
+      ],
+    ];
+
+    $this->assertEquals($expected, $renderElement);
+  }
+
+  public function testSingleCustomLink(): void {
+    $pluginDefinition = [
+      'id' => 'entity_add_links',
+      'title' => Markup::create('Go to link'),
+      'weight' => 5,
+      'route_name' => '<front>',
+      'route_parameters' => [],
+      'options' => [
+        'widget' => 'details',
+        'links' => 'custom',
+        'custom_links' => [
+                  [
                     'title' => 'Test link',
-                    'url' => Url::fromRoute($localAction->getRouteName(), $localAction->getRouteParameters($this->routeMatch)),
-                    'localized_options' => [
+                    'route_name' => 'user.admin_index',
+                    'route_parameters' => [],
+                  ],
+        ],
+        'fallback_title_prefix' => 'Go to',
+      ],
+      'appears_on' => ['<front>'],
+      'class' => 'Drupal\menu_ui\Plugin\Menu\LocalAction\MenuLinkAdd',
+      'provider' => 'test_provider',
+    ];
+
+    $redirectDestination = new RedirectDestination($this->requestStack, $this->urlGenerator);
+    $localAction = new MenuLinkAdd([], $pluginDefinition['id'], $pluginDefinition, $this->routeProvider, $redirectDestination);
+
+    /** @var \Drupal\user\Entity\User $user */
+    $user = User::load(1);
+
+    $renderElement = $this->factory->createFromLocalizedLocalActions(
+          $this->routeMatch,
+          $user,
+          new LocalizedLocalActionDecorator($localAction, $pluginDefinition['title']->__toString()),
+      );
+
+    $expected = [
+      'entity_add_links' => [
+        '#theme' => 'menu_local_action',
+        '#link' => [
+          'title' => 'Go to Test link',
+          'url' => Url::fromRoute(
+                      $pluginDefinition['options']['custom_links'][0]['route_name'],
+                      $pluginDefinition['options']['custom_links'][0]['route_parameters'],
+          ),
+          'localized_options' => array_merge(
+                      $pluginDefinition['options'],
+                      [
                         'query' => [
-                            'destination' => '/',
+                          'destination' => '/',
                         ],
-                    ],
-                ],
-                '#access' => AccessResult::allowed()->addCacheContexts(['user.permissions']),
-                '#weight' => null,
-            ],
-            '#cache' =>  [
-                'contexts' =>  [
-                    'route',
-                    'user.permissions',
-                ],
-                'tags' => [],
-                'max-age' => 0,
-            ],
-        ];
+                      ]
+          ),
+        ],
+        '#access' => AccessResult::allowed()->addCacheContexts(['user.permissions']),
+        '#weight' => 5,
+      ],
+      '#cache' => [
+        'contexts' => [
+          'route',
+          'user.permissions',
+        ],
+        'tags' => [],
+        'max-age' => 0,
+      ],
+    ];
 
-        $this->assertEquals($expected, $renderElement);
-    }
+    $this->assertEquals($expected, $renderElement);
+  }
 
-    public function testSingleCustomLink(): void {
-        $pluginDefinition = [
-            'id' => 'entity_add_links',
-            'title' => Markup::create('Go to link'),
-            'weight' => 5,
-            'route_name' => '<front>',
-            'route_parameters' => [],
-            'options' => [
-                'widget' => 'details',
-                'links' => 'custom',
-                'custom_links' => [
-                    [
-                        'title' => 'Test link',
-                        'route_name' => 'user.admin_index',
-                        'route_parameters' => [],
-                    ],
-                ],
-                'fallback_title_prefix' => 'Go to',
-            ],
-            'appears_on' => ['<front>'],
-            'class' => 'Drupal\menu_ui\Plugin\Menu\LocalAction\MenuLinkAdd',
-            'provider' => 'test_provider',
-        ];
+  public function testMultipleEntityAddLinks(): void {
+    $this->createContentType(['type' => 'bundle_1', 'name' => 'Bundle 1']);
+    $this->createContentType(['type' => 'bundle_2', 'name' => 'Bundle 2']);
 
-        $redirectDestination = new RedirectDestination($this->requestStack, $this->urlGenerator);
-        $localAction = new MenuLinkAdd([], $pluginDefinition['id'], $pluginDefinition, $this->routeProvider, $redirectDestination);
+    $pluginDefinition = [
+      'id' => 'entity_add_links',
+      'title' => Markup::create('Add node'),
+      'weight' => 5,
+      'route_name' => '<front>',
+      'route_parameters' => [],
+      'options' => [
+        'widget' => 'details',
+        'links' => 'entity_add',
+        'entity_type' => 'node',
+      ],
+      'appears_on' => ['<front>'],
+      'class' => 'Drupal\menu_ui\Plugin\Menu\LocalAction\MenuLinkAdd',
+      'provider' => 'test_provider',
+    ];
 
-        /** @var User $user */
-        $user = User::load(1);
+    $redirectDestination = new RedirectDestination($this->requestStack, $this->urlGenerator);
+    $localAction = new MenuLinkAdd([], $pluginDefinition['id'], $pluginDefinition, $this->routeProvider, $redirectDestination);
 
-        $renderElement = $this->factory->createFromLocalizedLocalActions(
-            $this->routeMatch,
-            $user,
-            new LocalizedLocalActionDecorator($localAction, $pluginDefinition['title']->__toString()),
-        );
+    /** @var \Drupal\user\Entity\User $user */
+    $user = User::load(1);
 
-        $expected = [
-            'entity_add_links' => [
-                '#theme' => 'menu_local_action',
-                '#link' => [
-                    'title' => 'Go to Test link',
-                    'url' => Url::fromRoute(
-                        $pluginDefinition['options']['custom_links'][0]['route_name'],
-                        $pluginDefinition['options']['custom_links'][0]['route_parameters'],
-                    ),
-                    'localized_options' => array_merge(
-                        $pluginDefinition['options'],
-                        [
-                            'query' => [
-                                'destination' => '/',
-                            ],
-                        ]
-                    )
-                ],
-                '#access' => AccessResult::allowed()->addCacheContexts(['user.permissions']),
-                '#weight' => 5,
-            ],
-            '#cache' =>  [
-                'contexts' =>  [
-                    'route',
-                    'user.permissions',
-                ],
-                'tags' => [],
-                'max-age' => 0,
-            ],
-        ];
+    $renderElement = $this->factory->createFromLocalizedLocalActions(
+          $this->routeMatch,
+          $user,
+          new LocalizedLocalActionDecorator($localAction, $pluginDefinition['title']->__toString()),
+      );
 
-        $this->assertEquals($expected, $renderElement);
-    }
-
-    public function testMultipleEntityAddLinks(): void {
-        $this->createContentType(['type' => 'bundle_1', 'name' => 'Bundle 1']);
-        $this->createContentType(['type' => 'bundle_2', 'name' => 'Bundle 2']);
-
-        $pluginDefinition = [
-            'id' => 'entity_add_links',
-            'title' => Markup::create('Add node'),
-            'weight' => 5,
-            'route_name' => '<front>',
-            'route_parameters' => [],
-            'options' => [
-                'widget' => 'details',
-                'links' => 'entity_add',
-                'entity_type' => 'node',
-            ],
-            'appears_on' => ['<front>'],
-            'class' => 'Drupal\menu_ui\Plugin\Menu\LocalAction\MenuLinkAdd',
-            'provider' => 'test_provider',
-        ];
-
-        $redirectDestination = new RedirectDestination($this->requestStack, $this->urlGenerator);
-        $localAction = new MenuLinkAdd([], $pluginDefinition['id'], $pluginDefinition, $this->routeProvider, $redirectDestination);
-
-        /** @var User $user */
-        $user = User::load(1);
-
-        $renderElement = $this->factory->createFromLocalizedLocalActions(
-            $this->routeMatch,
-            $user,
-            new LocalizedLocalActionDecorator($localAction, $pluginDefinition['title']->__toString()),
-        );
-
-        $expected = [
-            'entity_add_links' => [
-                '#theme' => 'actionlink_dropdown_details',
-                '#dropdown' => [
-                    'title' => 'Add node',
-                    'options' => [
-                        [
-                            'title' => Markup::create('Bundle 1'),
-                            'route_name' => 'node.add',
-                            'route_parameters' => [
-                                'node_type' => 'bundle_1',
-                            ],
-                            'access' => AccessResult::allowed()->addCacheContexts(['user.permissions']),
+    $expected = [
+      'entity_add_links' => [
+        '#theme' => 'actionlink_dropdown_details',
+        '#dropdown' => [
+          'title' => 'Add node',
+          'options' => [
+                      [
+                        'title' => Markup::create('Bundle 1'),
+                        'route_name' => 'node.add',
+                        'route_parameters' => [
+                          'node_type' => 'bundle_1',
                         ],
-                        [
-                            'title' => Markup::create('Bundle 2'),
-                            'route_name' => 'node.add',
-                            'route_parameters' => [
-                                'node_type' => 'bundle_2',
-                            ],
-                            'access' => AccessResult::allowed()->addCacheContexts(['user.permissions']),
+                        'access' => AccessResult::allowed()->addCacheContexts(['user.permissions']),
+                      ],
+                      [
+                        'title' => Markup::create('Bundle 2'),
+                        'route_name' => 'node.add',
+                        'route_parameters' => [
+                          'node_type' => 'bundle_2',
                         ],
-                    ],
-                    'localized_options' => [
-                        'widget' => 'details',
-                        'links' => 'entity_add',
-                        'entity_type' => 'node',
-                        'query' => [
-                            'destination' => '/',
-                        ],
-                    ],
-                ],
-                '#access' => AccessResult::allowed()->addCacheContexts(['user.permissions']),
-                '#weight' => 5,
+                        'access' => AccessResult::allowed()->addCacheContexts(['user.permissions']),
+                      ],
+          ],
+          'localized_options' => [
+            'widget' => 'details',
+            'links' => 'entity_add',
+            'entity_type' => 'node',
+            'query' => [
+              'destination' => '/',
             ],
-            '#cache' =>  [
-                'contexts' =>  [
-                    'route',
-                    'user.permissions',
-                ],
-                'tags' => [],
-                'max-age' => 0,
-            ],
-        ];
+          ],
+        ],
+        '#access' => AccessResult::allowed()->addCacheContexts(['user.permissions']),
+        '#weight' => 5,
+      ],
+      '#cache' => [
+        'contexts' => [
+          'route',
+          'user.permissions',
+        ],
+        'tags' => [],
+        'max-age' => 0,
+      ],
+    ];
 
-        $this->assertEquals($expected, $renderElement);
-    }
+    $this->assertEquals($expected, $renderElement);
+  }
+
 }

@@ -13,7 +13,6 @@ use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Render\Markup;
 use Drupal\Core\Session\AccountInterface;
-use LogicException;
 
 class EntityAddOptionsFactory {
   use InsertsFallbackTitlePrefixForSingleOption;
@@ -37,7 +36,7 @@ class EntityAddOptionsFactory {
     $entityTypeDefinition = $this->entityTypeManager->getDefinition($entityTypeId);
     $bundleEntityTypeId = $entityTypeDefinition->getBundleEntityType();
     if (!$bundleEntityTypeId) {
-      throw new LogicException("The entity type \"${entityTypeId}\" does not support bundles. Entity types without bundles are not supported for entity add links.");
+      throw new \LogicException("The entity type \"${entityTypeId}\" does not support bundles. Entity types without bundles are not supported for entity add links.");
     }
 
     $bundles = $this->bundleInfo->getBundleInfo($entityTypeId);
@@ -79,4 +78,5 @@ class EntityAddOptionsFactory {
 
     return "entity.${entityTypeId}.add_form";
   }
+
 }

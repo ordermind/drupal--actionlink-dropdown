@@ -8,16 +8,18 @@ use Symfony\Component\HttpFoundation\Request;
 use Drupal\Core\Http\RequestStack;
 
 trait OverridesRequestStack {
-    protected function createRequestStack(): RequestStack {
-        /** @var RequestStack $requestStack */
-        $requestStack = \Drupal::service('request_stack');
-        while ($requestStack->getCurrentRequest()) {
-            $requestStack->pop();
-        }
 
-        $request = Request::create('/');
-        $requestStack->push($request);
-
-        return $requestStack;
+  protected function createRequestStack(): RequestStack {
+    /** @var \Symfony\Component\HttpFoundation\RequestStack $requestStack */
+    $requestStack = \Drupal::service('request_stack');
+    while ($requestStack->getCurrentRequest()) {
+      $requestStack->pop();
     }
+
+    $request = Request::create('/');
+    $requestStack->push($request);
+
+    return $requestStack;
+  }
+
 }

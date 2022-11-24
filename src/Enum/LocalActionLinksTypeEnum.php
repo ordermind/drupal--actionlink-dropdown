@@ -10,11 +10,13 @@ class LocalActionLinksTypeEnum {
    *
    * Supported options:
    *
-   * - array custom_links -- Container for the custom links. Supported suboptions:
+   * - array custom_links -- Container for the custom links.
+   * Supported suboptions:
    *  - string title
    *  - string route_name
    *  - array route_parameters (optional)
-   * - string fallback_title_prefix -- The fallback title prefix, which is used if there is only one option.
+   * - string fallback_title_prefix -- The fallback title prefix,
+   * which is used if there is only one option.
    *
    * Example config options:
    *
@@ -41,7 +43,8 @@ class LocalActionLinksTypeEnum {
    * Supported options:
    *
    * - string entity_type -- The entity type id
-   * - string fallback_title_prefix (optional) -- The fallback title prefix, which is used if there is only one option.
+   * - string fallback_title_prefix (optional) -- The fallback title prefix,
+   * which is used if there is only one option.
    *
    * Example config options:
    *

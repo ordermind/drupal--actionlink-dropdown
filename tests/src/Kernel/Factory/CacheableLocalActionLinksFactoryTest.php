@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Tests\actionlink_dropdown\Kernel\Render;
+namespace Drupal\Tests\actionlink_dropdown\Kernel\Factory;
 
 use Drupal\actionlink_dropdown\Factory\CacheableLocalActionLinksFactory;
 use Drupal\actionlink_dropdown\Render\LocalActionRenderer;
@@ -17,7 +17,7 @@ use Drupal\Core\Routing\UrlGeneratorInterface;
 use Drupal\Core\Url;
 use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
 use Drupal\menu_ui\Plugin\Menu\LocalAction\MenuLinkAdd;
-use Drupal\Tests\actionlink_dropdown\Kernel\Concerns\OverridesRequestStack;
+use Drupal\Tests\actionlink_dropdown\Traits\OverridesRequestStack;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
 use Drupal\user\Entity\User;
 

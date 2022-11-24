@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Tests\actionlink_dropdown\Kernel\Concerns;
+namespace Drupal\Tests\actionlink_dropdown\Traits;
 
 use Symfony\Component\HttpFoundation\Request;
 use Drupal\Core\Http\RequestStack;

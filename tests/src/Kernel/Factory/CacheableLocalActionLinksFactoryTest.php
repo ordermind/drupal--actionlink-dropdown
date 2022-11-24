@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\actionlink_dropdown\Kernel\Render;
 
+use Drupal\actionlink_dropdown\Factory\CacheableLocalActionLinksFactory;
 use Drupal\actionlink_dropdown\Render\LocalActionRenderer;
+use Drupal\actionlink_dropdown\ValueObject\LocalizedLocalActionDecorator;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Http\RequestStack;
 use Drupal\Core\Render\Markup;
@@ -19,10 +21,11 @@ use Drupal\Tests\actionlink_dropdown\Kernel\Concerns\OverridesRequestStack;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
 use Drupal\user\Entity\User;
 
-class LocalActionRendererTest extends EntityKernelTestBase {
+class CacheableLocalActionLinksFactoryTest extends EntityKernelTestBase {
     use OverridesRequestStack;
     use ContentTypeCreationTrait;
 
+    protected CacheableLocalActionLinksFactory $factory;
     protected LocalActionRenderer $localActionRenderer;
     protected RouteProviderInterface $routeProvider;
     protected UrlGeneratorInterface $urlGenerator;
@@ -38,6 +41,7 @@ class LocalActionRendererTest extends EntityKernelTestBase {
         $this->installConfig(['node']);
         $this->setUpCurrentUser(['uid' => 1]);
 
+        $this->factory = \Drupal::service('actionlink_dropdown.local_action_links_factory');
         $this->localActionRenderer = \Drupal::service('actionlink_dropdown.renderer');
         $this->routeMatch = \Drupal::service('current_route_match');
         $this->routeProvider = \Drupal::service('router.route_provider');
@@ -63,26 +67,35 @@ class LocalActionRendererTest extends EntityKernelTestBase {
         /** @var User $user */
         $user = User::load(1);
 
-        $renderElement = $this->localActionRenderer->createRenderElement(
-            $localAction,
+        $renderElement = $this->factory->createFromLocalizedLocalActions(
             $this->routeMatch,
             $user,
-            $pluginDefinition['title']->__toString()
+            new LocalizedLocalActionDecorator($localAction, $pluginDefinition['title']->__toString()),
         );
 
         $expected = [
-            '#theme' => 'menu_local_action',
-            '#link' => [
-                'title' => 'Test link',
-                'url' => Url::fromRoute($localAction->getRouteName(), $localAction->getRouteParameters($this->routeMatch)),
-                'localized_options' => [
-                    'query' => [
-                        'destination' => '/',
+            'test_link' => [
+                '#theme' => 'menu_local_action',
+                '#link' => [
+                    'title' => 'Test link',
+                    'url' => Url::fromRoute($localAction->getRouteName(), $localAction->getRouteParameters($this->routeMatch)),
+                    'localized_options' => [
+                        'query' => [
+                            'destination' => '/',
+                        ],
                     ],
                 ],
+                '#access' => AccessResult::allowed()->addCacheContexts(['user.permissions']),
+                '#weight' => null,
             ],
-            '#access' => AccessResult::allowed()->addCacheContexts(['user.permissions']),
-            '#weight' => null,
+            '#cache' =>  [
+                'contexts' =>  [
+                    'route',
+                    'user.permissions',
+                ],
+                'tags' => [],
+                'max-age' => 0,
+            ],
         ];
 
         $this->assertEquals($expected, $renderElement);
@@ -118,32 +131,41 @@ class LocalActionRendererTest extends EntityKernelTestBase {
         /** @var User $user */
         $user = User::load(1);
 
-        $renderElement = $this->localActionRenderer->createRenderElement(
-            $localAction,
+        $renderElement = $this->factory->createFromLocalizedLocalActions(
             $this->routeMatch,
             $user,
-            $pluginDefinition['title']->__toString()
+            new LocalizedLocalActionDecorator($localAction, $pluginDefinition['title']->__toString()),
         );
 
         $expected = [
-            '#theme' => 'menu_local_action',
-            '#link' => [
-                'title' => 'Go to Test link',
-                'url' => Url::fromRoute(
-                    $pluginDefinition['options']['custom_links'][0]['route_name'],
-                    $pluginDefinition['options']['custom_links'][0]['route_parameters'],
-                ),
-                'localized_options' => array_merge(
-                    $pluginDefinition['options'],
-                    [
-                        'query' => [
-                            'destination' => '/',
-                        ],
-                    ]
-                )
+            'entity_add_links' => [
+                '#theme' => 'menu_local_action',
+                '#link' => [
+                    'title' => 'Go to Test link',
+                    'url' => Url::fromRoute(
+                        $pluginDefinition['options']['custom_links'][0]['route_name'],
+                        $pluginDefinition['options']['custom_links'][0]['route_parameters'],
+                    ),
+                    'localized_options' => array_merge(
+                        $pluginDefinition['options'],
+                        [
+                            'query' => [
+                                'destination' => '/',
+                            ],
+                        ]
+                    )
+                ],
+                '#access' => AccessResult::allowed()->addCacheContexts(['user.permissions']),
+                '#weight' => 5,
             ],
-            '#access' => AccessResult::allowed()->addCacheContexts(['user.permissions']),
-            '#weight' => 5,
+            '#cache' =>  [
+                'contexts' =>  [
+                    'route',
+                    'user.permissions',
+                ],
+                'tags' => [],
+                'max-age' => 0,
+            ],
         ];
 
         $this->assertEquals($expected, $renderElement);
@@ -175,46 +197,55 @@ class LocalActionRendererTest extends EntityKernelTestBase {
         /** @var User $user */
         $user = User::load(1);
 
-        $renderElement = $this->localActionRenderer->createRenderElement(
-            $localAction,
+        $renderElement = $this->factory->createFromLocalizedLocalActions(
             $this->routeMatch,
             $user,
-            $pluginDefinition['title']->__toString()
+            new LocalizedLocalActionDecorator($localAction, $pluginDefinition['title']->__toString()),
         );
 
         $expected = [
-            '#theme' => 'actionlink_dropdown_details',
-            '#dropdown' => [
-                'title' => 'Add node',
-                'options' => [
-                    [
-                        'title' => Markup::create('Bundle 1'),
-                        'route_name' => 'node.add',
-                        'route_parameters' => [
-                            'node_type' => 'bundle_1',
+            'entity_add_links' => [
+                '#theme' => 'actionlink_dropdown_details',
+                '#dropdown' => [
+                    'title' => 'Add node',
+                    'options' => [
+                        [
+                            'title' => Markup::create('Bundle 1'),
+                            'route_name' => 'node.add',
+                            'route_parameters' => [
+                                'node_type' => 'bundle_1',
+                            ],
+                            'access' => AccessResult::allowed()->addCacheContexts(['user.permissions']),
                         ],
-                        'access' => AccessResult::allowed()->addCacheContexts(['user.permissions']),
+                        [
+                            'title' => Markup::create('Bundle 2'),
+                            'route_name' => 'node.add',
+                            'route_parameters' => [
+                                'node_type' => 'bundle_2',
+                            ],
+                            'access' => AccessResult::allowed()->addCacheContexts(['user.permissions']),
+                        ],
                     ],
-                    [
-                        'title' => Markup::create('Bundle 2'),
-                        'route_name' => 'node.add',
-                        'route_parameters' => [
-                            'node_type' => 'bundle_2',
+                    'localized_options' => [
+                        'widget' => 'details',
+                        'links' => 'entity_add',
+                        'entity_type' => 'node',
+                        'query' => [
+                            'destination' => '/',
                         ],
-                        'access' => AccessResult::allowed()->addCacheContexts(['user.permissions']),
                     ],
                 ],
-                'localized_options' => [
-                    'widget' => 'details',
-                    'links' => 'entity_add',
-                    'entity_type' => 'node',
-                    'query' => [
-                        'destination' => '/',
-                    ],
-                ],
+                '#access' => AccessResult::allowed()->addCacheContexts(['user.permissions']),
+                '#weight' => 5,
             ],
-            '#access' => AccessResult::allowed()->addCacheContexts(['user.permissions']),
-            '#weight' => 5,
+            '#cache' =>  [
+                'contexts' =>  [
+                    'route',
+                    'user.permissions',
+                ],
+                'tags' => [],
+                'max-age' => 0,
+            ],
         ];
 
         $this->assertEquals($expected, $renderElement);

@@ -7,7 +7,6 @@ namespace Drupal\actionlink_dropdown\Menu;
 use Drupal\actionlink_dropdown\Factory\CacheableLocalActionLinksFactory;
 use Drupal\actionlink_dropdown\ValueObject\LocalizedLocalActionDecorator;
 use Drupal\Core\Menu\LocalActionManager as BaseManager;
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Access\AccessManagerInterface;
 use Drupal\Core\Cache\CacheBackendInterface;

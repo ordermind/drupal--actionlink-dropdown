@@ -17,7 +17,7 @@ use Drupal\Core\Routing\UrlGeneratorInterface;
 use Drupal\Core\Url;
 use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
 use Drupal\menu_ui\Plugin\Menu\LocalAction\MenuLinkAdd;
-use Drupal\Tests\actionlink_dropdown\Traits\OverridesRequestStack;
+use Drupal\Tests\actionlink_dropdown\Kernel\Traits\OverridesRequestStack;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
 use Drupal\user\Entity\User;
 

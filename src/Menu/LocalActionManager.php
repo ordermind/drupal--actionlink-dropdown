@@ -54,6 +54,8 @@ class LocalActionManager extends BaseManager {
 
   /**
    * {@inheritdoc}
+   * 
+   * Changes the parent method to delegate the creation of the render arrays to an external service.
    */
   public function getActionsForRoute($route_appears) {
     if (!isset($this->instances[$route_appears])) {
@@ -74,6 +76,10 @@ class LocalActionManager extends BaseManager {
       }
     }
 
+    return $this->createRenderArrays($route_appears);
+  }
+
+  protected function createRenderArrays(string $route_appears): array {
     /** @var LocalActionInterface[] $relevantInstances */
     $relevantInstances = $this->instances[$route_appears];
 

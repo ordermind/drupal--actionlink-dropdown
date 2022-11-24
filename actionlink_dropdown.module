@@ -2,8 +2,6 @@
 
 declare(strict_types=1);
 
-use Drupal\Core\Url;
-
 /**
  * Implements hook_theme().
  */
@@ -22,102 +20,31 @@ function actionlink_dropdown_theme() {
 }
 
 /**
- * Implements hook_preprocess_HOOK().
+ * Implements hook_preprocess_actionlink_dropdown_details().
  */
 function actionlink_dropdown_preprocess_actionlink_dropdown_details(array &$variables) {
-  $dropdown = $variables['element']['#dropdown'];
-  $variables['dropdown'] = [
-    '#type' => 'details',
-    '#title' => $dropdown['title'],
-    '#attributes' => [
-      'class' => [
-        'button',
-        'button-action',
-        'button--primary',
-        'button--small',
-      ],
-    ],
-    'content' => [
-      '#theme' => 'item_list',
-      '#type' => 'ul',
-      '#items' => array_map(
-        function (array $option) use ($dropdown) {
-          $url = Url::fromRoute($option['route_name'], $option['route_parameters'] ?? [], $dropdown['localized_options'] ?? []);
+  /** @var \Drupal\actionlink_dropdown\HookHandlers\PreprocessHandlers\PreprocessActionlinkDropdownDetailsHandler $service */
+  $service = \Drupal::service('actionlink_dropdown.hook_handlers.preprocess_actionlink_dropdown_details');
 
-          return [
-            '#type' => 'link',
-            '#title' => $option['title'],
-            '#url' => $url,
-            '#access' => $option['access'],
-          ];
-        },
-        $dropdown['options']
-      ),
-    ],
-  ];
-
-  $variables['add_wrapper'] = empty($variables['element']['#skip_wrapper']);
+  $service->preprocess($variables);
 }
 
 /**
- * Implements hook_preprocess_HOOK().
+ * Implements hook_preprocess_actionlink_dropdown_select().
  */
 function actionlink_dropdown_preprocess_actionlink_dropdown_select(array &$variables) {
-  $dropdown = $variables['element']['#dropdown'];
-  $variables['dropdown'] = [
-    '#type' => 'select',
-    '#options' => ['' => $dropdown['title']],
-    '#attributes' => [
-      'class' => [
-        'button',
-        'button-action',
-        'button--primary',
-        'button--small',
-      ],
-      'onchange' => 'if(value) window.location.href = value; value = \'\';',
-    ],
-    '#wrapper_attributes' => [
-      'class' => ['actionlink-dropdown-select-container'],
-    ],
-  ];
-  foreach ($dropdown['options'] as $option) {
-    /** @var \Drupal\Core\Access\AccessResultInterface $accessResult */
-    $accessResult = $option['access'];
+  /** @var \Drupal\actionlink_dropdown\HookHandlers\PreprocessHandlers\PreprocessActionlinkDropdownSelectHandler $service */
+  $service = \Drupal::service('actionlink_dropdown.hook_handlers.preprocess_actionlink_dropdown_select');
 
-    // Select lists don't support passing access information for individual
-    // options, so we have to filter them manually.
-    if (!$accessResult->isAllowed()) {
-      continue;
-    }
-
-    $url = Url::fromRoute($option['route_name'], $option['route_parameters'] ?? [], $dropdown['localized_options'] ?? []);
-
-    $variables['dropdown']['#options'][$url->toString()] = $option['title'];
-  }
-
-  $variables['add_wrapper'] = empty($variables['element']['#skip_wrapper']);
+  $service->preprocess($variables);
 }
 
 /**
- * Implements hook_preprocess_HOOK().
+ * Implements hook_preprocess_actionlink_dropdown_details_select().
  */
 function actionlink_dropdown_preprocess_actionlink_dropdown_details_select(array &$variables) {
-  $variables['dropdown'] = [
-    '#type' => 'container',
-    '#attributes' => [
-      'class' => [
-        'actionlink-dropdown-details-select-container',
-      ],
-    ],
-    'details' => [
-      '#theme' => 'actionlink_dropdown_details',
-      '#dropdown' => $variables['element']['#dropdown'],
-      '#skip_wrapper' => TRUE,
-    ],
-    'select' => [
-      '#theme' => 'actionlink_dropdown_select',
-      '#dropdown' => $variables['element']['#dropdown'],
-      '#skip_wrapper' => TRUE,
-    ],
-  ];
+  /** @var \Drupal\actionlink_dropdown\HookHandlers\PreprocessHandlers\PreprocessActionlinkDropdownDetailsSelectHandler $service */
+  $service = \Drupal::service('actionlink_dropdown.hook_handlers.preprocess_actionlink_dropdown_details_select');
+
+  $service->preprocess($variables);
 }

@@ -19,6 +19,16 @@ services:
     class: Drupal\actionlink_dropdown\Render\LocalActionRenderer
     arguments: ['@actionlink_dropdown.options_factory', '@access_manager']
 
+  # Hook handlers
+  actionlink_dropdown.hook_handlers.preprocess_actionlink_dropdown_details:
+    class: Drupal\actionlink_dropdown\HookHandlers\PreprocessHandlers\PreprocessActionlinkDropdownDetailsHandler
+
+  actionlink_dropdown.hook_handlers.preprocess_actionlink_dropdown_select:
+    class: Drupal\actionlink_dropdown\HookHandlers\PreprocessHandlers\PreprocessActionlinkDropdownSelectHandler
+
+  actionlink_dropdown.hook_handlers.preprocess_actionlink_dropdown_details_select:
+    class: Drupal\actionlink_dropdown\HookHandlers\PreprocessHandlers\PreprocessActionlinkDropdownDetailsSelectHandler
+
   # Overrides
   plugin.manager.menu.local_action:
     class: Drupal\actionlink_dropdown\Menu\LocalActionManager

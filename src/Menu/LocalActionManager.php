@@ -91,19 +91,4 @@ class LocalActionManager extends BaseManager {
       ...$localizedLocalActions
     );
   }
-
-  /**
-   * Adds access caching metadata not only for regular links but also for dropdown links.
-   */
-  protected function addAccessCaching(array &$renderArray, CacheableMetadata $cacheability): void {
-    $cacheability->addCacheableDependency($renderArray['#access']);
-
-    if (empty($renderArray['#dropdown'])) {
-      return;
-    }
-
-    foreach ($renderArray['#dropdown']['options'] as $option) {
-      $cacheability->addCacheableDependency($option['access']);
-    }
-  }
 }

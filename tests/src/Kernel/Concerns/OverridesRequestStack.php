@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Tests\actionlink_dropdown\Kernel\Traits;
+namespace Drupal\Tests\actionlink_dropdown\Kernel\Concerns;
 
 use Symfony\Component\HttpFoundation\Request;
 use Drupal\Core\Http\RequestStack;
@@ -21,5 +21,4 @@ trait OverridesRequestStack {
 
     return $requestStack;
   }
-
 }

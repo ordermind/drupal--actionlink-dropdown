@@ -17,7 +17,7 @@ use Drupal\Core\Routing\UrlGeneratorInterface;
 use Drupal\Core\Url;
 use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
 use Drupal\menu_ui\Plugin\Menu\LocalAction\MenuLinkAdd;
-use Drupal\Tests\actionlink_dropdown\Kernel\Traits\OverridesRequestStack;
+use Drupal\Tests\actionlink_dropdown\Kernel\Concerns\OverridesRequestStack;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
 use Drupal\user\Entity\User;
 
@@ -68,10 +68,10 @@ class CacheableLocalActionLinksFactoryTest extends EntityKernelTestBase {
     $user = User::load(1);
 
     $renderElement = $this->factory->createFromLocalizedLocalActions(
-          $this->routeMatch,
-          $user,
-          new LocalizedLocalActionDecorator($localAction, $pluginDefinition['title']->__toString()),
-      );
+      $this->routeMatch,
+      $user,
+      new LocalizedLocalActionDecorator($localAction, $pluginDefinition['title']->__toString()),
+    );
 
     $expected = [
       'test_link' => [
@@ -112,11 +112,11 @@ class CacheableLocalActionLinksFactoryTest extends EntityKernelTestBase {
         'widget' => 'details',
         'links' => 'custom',
         'custom_links' => [
-                  [
-                    'title' => 'Test link',
-                    'route_name' => 'user.admin_index',
-                    'route_parameters' => [],
-                  ],
+          [
+            'title' => 'Test link',
+            'route_name' => 'user.admin_index',
+            'route_parameters' => [],
+          ],
         ],
         'fallback_title_prefix' => 'Go to',
       ],
@@ -132,10 +132,10 @@ class CacheableLocalActionLinksFactoryTest extends EntityKernelTestBase {
     $user = User::load(1);
 
     $renderElement = $this->factory->createFromLocalizedLocalActions(
-          $this->routeMatch,
-          $user,
-          new LocalizedLocalActionDecorator($localAction, $pluginDefinition['title']->__toString()),
-      );
+      $this->routeMatch,
+      $user,
+      new LocalizedLocalActionDecorator($localAction, $pluginDefinition['title']->__toString()),
+    );
 
     $expected = [
       'entity_add_links' => [
@@ -143,16 +143,16 @@ class CacheableLocalActionLinksFactoryTest extends EntityKernelTestBase {
         '#link' => [
           'title' => 'Go to Test link',
           'url' => Url::fromRoute(
-                      $pluginDefinition['options']['custom_links'][0]['route_name'],
-                      $pluginDefinition['options']['custom_links'][0]['route_parameters'],
+            $pluginDefinition['options']['custom_links'][0]['route_name'],
+            $pluginDefinition['options']['custom_links'][0]['route_parameters'],
           ),
           'localized_options' => array_merge(
-                      $pluginDefinition['options'],
-                      [
-                        'query' => [
-                          'destination' => '/',
-                        ],
-                      ]
+            $pluginDefinition['options'],
+            [
+              'query' => [
+                'destination' => '/',
+              ],
+            ]
           ),
         ],
         '#access' => AccessResult::allowed()->addCacheContexts(['user.permissions']),
@@ -198,10 +198,10 @@ class CacheableLocalActionLinksFactoryTest extends EntityKernelTestBase {
     $user = User::load(1);
 
     $renderElement = $this->factory->createFromLocalizedLocalActions(
-          $this->routeMatch,
-          $user,
-          new LocalizedLocalActionDecorator($localAction, $pluginDefinition['title']->__toString()),
-      );
+      $this->routeMatch,
+      $user,
+      new LocalizedLocalActionDecorator($localAction, $pluginDefinition['title']->__toString()),
+    );
 
     $expected = [
       'entity_add_links' => [
@@ -209,22 +209,22 @@ class CacheableLocalActionLinksFactoryTest extends EntityKernelTestBase {
         '#dropdown' => [
           'title' => 'Add node',
           'options' => [
-                      [
-                        'title' => Markup::create('Bundle 1'),
-                        'route_name' => 'node.add',
-                        'route_parameters' => [
-                          'node_type' => 'bundle_1',
-                        ],
-                        'access' => AccessResult::allowed()->addCacheContexts(['user.permissions']),
-                      ],
-                      [
-                        'title' => Markup::create('Bundle 2'),
-                        'route_name' => 'node.add',
-                        'route_parameters' => [
-                          'node_type' => 'bundle_2',
-                        ],
-                        'access' => AccessResult::allowed()->addCacheContexts(['user.permissions']),
-                      ],
+            [
+              'title' => Markup::create('Bundle 1'),
+              'route_name' => 'node.add',
+              'route_parameters' => [
+                'node_type' => 'bundle_1',
+              ],
+              'access' => AccessResult::allowed()->addCacheContexts(['user.permissions']),
+            ],
+            [
+              'title' => Markup::create('Bundle 2'),
+              'route_name' => 'node.add',
+              'route_parameters' => [
+                'node_type' => 'bundle_2',
+              ],
+              'access' => AccessResult::allowed()->addCacheContexts(['user.permissions']),
+            ],
           ],
           'localized_options' => [
             'widget' => 'details',
@@ -250,5 +250,4 @@ class CacheableLocalActionLinksFactoryTest extends EntityKernelTestBase {
 
     $this->assertEquals($expected, $renderElement);
   }
-
 }

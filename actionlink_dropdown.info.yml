@@ -1,7 +1,7 @@
 name: Action Link Dropdown
 type: module
 description: 'Adds support for action links that contain multiple dropdown options'
-package: Other
+package: Tengström Modules
 core_version_requirement: ^9
 
 version: 0.1.0

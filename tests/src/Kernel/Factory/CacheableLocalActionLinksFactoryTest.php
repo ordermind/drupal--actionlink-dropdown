@@ -8,7 +8,6 @@ use Drupal\actionlink_dropdown\Factory\CacheableLocalActionLinksFactory;
 use Drupal\actionlink_dropdown\Render\LocalActionRenderer;
 use Drupal\actionlink_dropdown\ValueObject\LocalizedLocalActionDecorator;
 use Drupal\Core\Access\AccessResult;
-use Drupal\Core\Http\RequestStack;
 use Drupal\Core\Render\Markup;
 use Drupal\Core\Routing\RedirectDestination;
 use Drupal\Core\Routing\RouteMatchInterface;
@@ -20,6 +19,7 @@ use Drupal\menu_ui\Plugin\Menu\LocalAction\MenuLinkAdd;
 use Drupal\Tests\actionlink_dropdown\Kernel\Concerns\OverridesRequestStack;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
 use Drupal\user\Entity\User;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class CacheableLocalActionLinksFactoryTest extends EntityKernelTestBase {
   use OverridesRequestStack;

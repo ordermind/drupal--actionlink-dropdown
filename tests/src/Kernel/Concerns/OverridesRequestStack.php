@@ -5,12 +5,11 @@ declare(strict_types=1);
 namespace Drupal\Tests\actionlink_dropdown\Kernel\Concerns;
 
 use Symfony\Component\HttpFoundation\Request;
-use Drupal\Core\Http\RequestStack;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 trait OverridesRequestStack {
 
   protected function createRequestStack(): RequestStack {
-    /** @var \Symfony\Component\HttpFoundation\RequestStack $requestStack */
     $requestStack = \Drupal::service('request_stack');
     while ($requestStack->getCurrentRequest()) {
       $requestStack->pop();

@@ -36,7 +36,7 @@ class EntityAddOptionsFactory {
     $entityTypeDefinition = $this->entityTypeManager->getDefinition($entityTypeId);
     $bundleEntityTypeId = $entityTypeDefinition->getBundleEntityType();
     if (!$bundleEntityTypeId) {
-      throw new \LogicException("The entity type \"${entityTypeId}\" does not support bundles. Entity types without bundles are not supported for entity add links.");
+      throw new \LogicException("The entity type \"{$entityTypeId}\" does not support bundles. Entity types without bundles are not supported for entity add links.");
     }
 
     $bundles = $this->bundleInfo->getBundleInfo($entityTypeId);
@@ -76,7 +76,7 @@ class EntityAddOptionsFactory {
       return 'node.add';
     }
 
-    return "entity.${entityTypeId}.add_form";
+    return "entity.{$entityTypeId}.add_form";
   }
 
 }

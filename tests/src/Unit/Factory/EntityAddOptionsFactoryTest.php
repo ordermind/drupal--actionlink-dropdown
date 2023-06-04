@@ -67,7 +67,7 @@ class EntityAddOptionsFactoryTest extends UnitTestCase {
 
     $factory = new EntityAddOptionsFactory($entityTypeManager, $bundleInfo, $accessManager);
 
-    $this->expectExceptionObject(new \LogicException("The entity type \"${entityTypeId}\" does not support bundles. Entity types without bundles are not supported for entity add links."));
+    $this->expectExceptionObject(new \LogicException("The entity type \"{$entityTypeId}\" does not support bundles. Entity types without bundles are not supported for entity add links."));
     $factory->create(new EntityAddConfig($entityTypeId), $account, 'test_context');
   }
 

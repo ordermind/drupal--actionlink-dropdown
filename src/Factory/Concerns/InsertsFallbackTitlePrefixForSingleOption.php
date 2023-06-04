@@ -33,7 +33,7 @@ trait InsertsFallbackTitlePrefixForSingleOption {
     return new LocalActionOptionCollection([
       new LocalActionOption(
         $this->t(
-          "${fallbackTitlePrefix} @option",
+          "{$fallbackTitlePrefix} @option",
           ['@option' => $firstOption->getTitle()],
           ['context' => $translationContext]
         ),

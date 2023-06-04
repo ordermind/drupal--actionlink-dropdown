@@ -105,7 +105,7 @@ class LocalActionRenderer {
     }
 
     return [
-      '#theme' => "actionlink_dropdown_${type}",
+      '#theme' => "actionlink_dropdown_{$type}",
       '#dropdown' => [
         'title' => $title,
         'options' => $localActionOptions->untype()->map(fn (LocalActionOption $option) => $option->toArray())->toArray(),

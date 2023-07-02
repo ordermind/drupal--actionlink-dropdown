@@ -86,7 +86,7 @@ class LocalActionManager extends BaseManager {
     /** @var \Drupal\actionlink_dropdown\ValueObject\LocalizedLocalActionDecorator[] $localizedLocalActions */
     $localizedLocalActions = array_map(
       function (LocalActionInterface $plugin): LocalizedLocalActionDecorator {
-        return new LocalizedLocalActionDecorator($plugin, $this->getTitle($plugin));
+        return new LocalizedLocalActionDecorator($plugin, (string) $this->getTitle($plugin));
       },
       array_values($relevantInstances)
     );

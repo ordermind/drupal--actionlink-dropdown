@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\actionlink_dropdown\Factory;
 
 use Drupal\actionlink_dropdown\Collection\LocalActionOptionCollection;
-use Drupal\actionlink_dropdown\Factory\Concerns\InsertsFallbackTitlePrefixForSingleOption;
 use Drupal\actionlink_dropdown\ValueObject\EntityAddConfig;
 use Drupal\actionlink_dropdown\ValueObject\LocalActionOption;
 use Drupal\Core\Access\AccessManagerInterface;
@@ -13,9 +12,10 @@ use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Render\Markup;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 class EntityAddOptionsFactory {
-  use InsertsFallbackTitlePrefixForSingleOption;
+  use StringTranslationTrait;
 
   protected EntityTypeManagerInterface $entityTypeManager;
   protected EntityTypeBundleInfoInterface $bundleInfo;
@@ -44,8 +44,8 @@ class EntityAddOptionsFactory {
       return new LocalActionOptionCollection();
     }
 
-    $options = (new LocalActionOptionCollection(
-      array_map(function (string $bundleId, array $bundleInfo) use ($entityTypeId, $bundleEntityTypeId, $account) {
+    return new LocalActionOptionCollection(
+      array_map(function (string $bundleId, array $bundleInfo) use ($entityTypeId, $bundleEntityTypeId, $account, $config, $translationContext) {
         $routeName = $this->getAddEntityRoute($entityTypeId);
         $routeParameters = [$bundleEntityTypeId => $bundleId];
         $access = $this->accessManager->checkNamedRoute(
@@ -55,19 +55,19 @@ class EntityAddOptionsFactory {
           TRUE
         );
 
+        $title = Markup::create($bundleInfo['label']);
+
         return new LocalActionOption(
-          Markup::create($bundleInfo['label']),
+          $title,
+          $this->t($config->getFallbackTitlePrefix() . ' @option',
+            ['@option' => $title],
+            ['context' => $translationContext]
+          ),
           $access,
           $routeName,
           $routeParameters
         );
       }, array_keys($bundles), array_values($bundles))
-    ));
-
-    return $this->insertFallbackTitlePrefixForSingleOption(
-      $options,
-      $config->getFallbackTitlePrefix(),
-      $translationContext
     );
   }
 

@@ -9,12 +9,14 @@ use Drupal\Core\Access\AccessResultInterface;
 
 class LocalActionOption {
   protected MarkupInterface $title;
+  protected MarkupInterface $fallbackTitle;
   protected AccessResultInterface $accessResult;
   protected string $routeName;
   protected array $routeParameters;
 
-  public function __construct(MarkupInterface $title, AccessResultInterface $accessResult, string $routeName, array $routeParameters = []) {
+  public function __construct(MarkupInterface $title, MarkupInterface $fallbackTitle, AccessResultInterface $accessResult, string $routeName, array $routeParameters = []) {
     $this->title = $title;
+    $this->fallbackTitle = $fallbackTitle;
     $this->accessResult = $accessResult;
     $this->routeName = $routeName;
     $this->routeParameters = $routeParameters;
@@ -22,6 +24,10 @@ class LocalActionOption {
 
   public function getTitle(): MarkupInterface {
     return $this->title;
+  }
+
+  public function getFallbackTitle(): MarkupInterface {
+    return $this->fallbackTitle;
   }
 
   public function getAccessResult(): AccessResultInterface {
@@ -39,6 +45,7 @@ class LocalActionOption {
   public function toArray(): array {
     return [
       'title' => $this->getTitle(),
+      'fallback_title' => $this->getFallbackTitle(),
       'access' => $this->getAccessResult(),
       'route_name' => $this->getRouteName(),
       'route_parameters' => $this->getRouteParameters(),

@@ -27,23 +27,42 @@ class PreprocessActionlinkDropdownDetailsHandler {
       'content' => [
         '#theme' => 'item_list',
         '#type' => 'ul',
-        '#items' => array_map(
-                  function (array $option) use ($dropdown) {
-                      $url = Url::fromRoute($option['route_name'], $option['route_parameters'] ?? [], $dropdown['localized_options'] ?? []);
+        '#items' => array_filter(
+          array_map(
+            function (array $option) use ($dropdown) {
+              $url = Url::fromRoute($option['route_name'], $option['route_parameters'] ?? [], $dropdown['localized_options'] ?? []);
 
-                      return [
-                        '#type' => 'link',
-                        '#title' => $option['title'],
-                        '#url' => $url,
-                        '#access' => $option['access'],
-                      ];
-                  },
-                  $dropdown['options']
-        ),
+              return [
+                '#type' => 'link',
+                '#title' => $option['title'],
+                '#fallback_title' => $option['fallback_title'],
+                '#url' => $url,
+                '#access' => $option['access'],
+              ];
+            },
+            $dropdown['options']
+          ),
+          fn (array $item) => $item['#access']->isAllowed()
+        )
       ],
     ];
 
-    $variables['add_wrapper'] = empty($variables['element']['#skip_wrapper']);
-  }
+    // Only display a details element if there is more than one item in the list.
+    $itemCount = count($variables['dropdown']['content']['#items']);
 
+    if($itemCount > 1) {
+      $variables['add_wrapper'] = empty($variables['element']['#skip_wrapper']);
+    } elseif($itemCount === 1) {
+      $firstItem = reset($variables['dropdown']['content']['#items']);
+      $variables['dropdown'] = [
+        '#theme' => 'menu_local_action',
+        '#link' => [
+          'title' => $firstItem['#fallback_title'],
+          'url' => $firstItem['#url'],
+        ],
+      ];
+    } else {
+      $variables['dropdown'] = [];
+    }
+  }
 }

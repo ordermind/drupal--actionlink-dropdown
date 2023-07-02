@@ -29,22 +29,32 @@ class PreprocessActionlinkDropdownSelectHandler {
         'class' => ['actionlink-dropdown-select-container'],
       ],
     ];
-    foreach ($dropdown['options'] as $option) {
-      /** @var \Drupal\Core\Access\AccessResultInterface $accessResult */
-      $accessResult = $option['access'];
 
-      // Select lists don't support passing access information for individual
-      // options, so we have to filter them manually.
-      if (!$accessResult->isAllowed()) {
-        continue;
+    // Filter out options that are not allowed.
+    $dropdown['options'] = array_filter($dropdown['options'], fn (array $option) => $option['access']->isAllowed());
+
+    // Only display a select list if there is more than one option in the select list.
+    if(count($dropdown['options']) > 1) {
+      foreach ($dropdown['options'] as $option) {
+        $url = Url::fromRoute($option['route_name'], $option['route_parameters'] ?? [], $dropdown['localized_options'] ?? []);
+
+        $variables['dropdown']['#options'][$url->toString()] = $option['title'];
       }
 
-      $url = Url::fromRoute($option['route_name'], $option['route_parameters'] ?? [], $dropdown['localized_options'] ?? []);
+      $variables['add_wrapper'] = empty($variables['element']['#skip_wrapper']);
+    } elseif(count($dropdown['options']) === 1) {
+      $firstOption = reset($dropdown['options']);
 
-      $variables['dropdown']['#options'][$url->toString()] = $option['title'];
+      $variables['dropdown'] = [
+        '#theme' => 'menu_local_action',
+        '#link' => [
+          'title' => $firstOption['fallback_title'],
+          'url' => Url::fromRoute($firstOption['route_name'], $firstOption['route_parameters'] ?? [], $dropdown['localized_options'] ?? []),
+        ],
+      ];
+    } else {
+      $variables['dropdown'] = [];
     }
-
-    $variables['add_wrapper'] = empty($variables['element']['#skip_wrapper']);
   }
 
 }

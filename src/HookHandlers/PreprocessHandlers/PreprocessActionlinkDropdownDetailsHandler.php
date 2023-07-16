@@ -43,16 +43,18 @@ class PreprocessActionlinkDropdownDetailsHandler {
             $dropdown['options']
           ),
           fn (array $item) => $item['#access']->isAllowed()
-        )
+        ),
       ],
     ];
 
-    // Only display a details element if there is more than one item in the list.
+    // Only display a details element if there is more than one item in
+    // the list.
     $itemCount = count($variables['dropdown']['content']['#items']);
 
-    if($itemCount > 1) {
+    if ($itemCount > 1) {
       $variables['add_wrapper'] = empty($variables['element']['#skip_wrapper']);
-    } elseif($itemCount === 1) {
+    }
+    elseif ($itemCount === 1) {
       $firstItem = reset($variables['dropdown']['content']['#items']);
       $variables['dropdown'] = [
         '#theme' => 'menu_local_action',
@@ -61,8 +63,10 @@ class PreprocessActionlinkDropdownDetailsHandler {
           'url' => $firstItem['#url'],
         ],
       ];
-    } else {
+    }
+    else {
       $variables['dropdown'] = [];
     }
   }
+
 }

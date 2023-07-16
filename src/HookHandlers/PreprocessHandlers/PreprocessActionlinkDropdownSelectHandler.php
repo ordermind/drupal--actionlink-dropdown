@@ -33,8 +33,9 @@ class PreprocessActionlinkDropdownSelectHandler {
     // Filter out options that are not allowed.
     $dropdown['options'] = array_filter($dropdown['options'], fn (array $option) => $option['access']->isAllowed());
 
-    // Only display a select list if there is more than one option in the select list.
-    if(count($dropdown['options']) > 1) {
+    // Only display a select list if there is more than one option in the
+    // select list.
+    if (count($dropdown['options']) > 1) {
       foreach ($dropdown['options'] as $option) {
         $url = Url::fromRoute($option['route_name'], $option['route_parameters'] ?? [], $dropdown['localized_options'] ?? []);
 
@@ -42,7 +43,8 @@ class PreprocessActionlinkDropdownSelectHandler {
       }
 
       $variables['add_wrapper'] = empty($variables['element']['#skip_wrapper']);
-    } elseif(count($dropdown['options']) === 1) {
+    }
+    elseif (count($dropdown['options']) === 1) {
       $firstOption = reset($dropdown['options']);
 
       $variables['dropdown'] = [
@@ -52,7 +54,8 @@ class PreprocessActionlinkDropdownSelectHandler {
           'url' => Url::fromRoute($firstOption['route_name'], $firstOption['route_parameters'] ?? [], $dropdown['localized_options'] ?? []),
         ],
       ];
-    } else {
+    }
+    else {
       $variables['dropdown'] = [];
     }
   }

@@ -6,18 +6,18 @@ namespace Drupal\actionlink_dropdown\Menu;
 
 use Drupal\actionlink_dropdown\Factory\CacheableLocalActionLinksFactory;
 use Drupal\actionlink_dropdown\ValueObject\LocalizedLocalActionDecorator;
-use Drupal\Core\Menu\LocalActionManager as BaseManager;
-use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Access\AccessManagerInterface;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Menu\LocalActionInterface;
+use Drupal\Core\Menu\LocalActionManager as BaseManager;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Routing\RouteProviderInterface;
+use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface;
-use Drupal\Core\Session\AccountInterface;
 
 class LocalActionManager extends BaseManager {
   use StringTranslationTrait;

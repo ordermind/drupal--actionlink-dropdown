@@ -125,11 +125,11 @@ class LocalActionRendererTest extends UnitTestCase {
 
     $localActionOptions = new LocalActionOptionCollection([
       new LocalActionOption(
-    // Here we simulate that the title has already been merged with the fallback title prefix.
-              Markup::create('Add Bundle 1'),
-              AccessResult::forbidden()->addCacheContexts(['user.permissions']),
-              'node.add',
-              ['node_type' => 'bundle_1']
+        Markup::create('Bundle 1'),
+        Markup::create('Add Bundle 1'),
+        AccessResult::forbidden()->addCacheContexts(['user.permissions']),
+        'node.add',
+        ['node_type' => 'bundle_1']
       ),
     ]);
 
@@ -146,19 +146,19 @@ class LocalActionRendererTest extends UnitTestCase {
     $renderer = new LocalActionRenderer($optionsFactory, $accessManager);
 
     $renderElement = $renderer->createRenderElement(
-          $localAction,
-          $routeMatch,
-          $account,
-          'Add node'
-      );
+      $localAction,
+      $routeMatch,
+      $account,
+      'Add node'
+    );
 
     $expected = [
       '#theme' => 'menu_local_action',
       '#link' => [
         'title' => 'Add Bundle 1',
         'url' => Url::fromRoute(
-                  $localActionOptions->get(0)->getRouteName(),
-                  $localActionOptions->get(0)->getRouteParameters()
+          $localActionOptions->get(0)->getRouteName(),
+          $localActionOptions->get(0)->getRouteParameters()
         ),
         'localized_options' => $pluginOptions,
       ],
@@ -176,7 +176,7 @@ class LocalActionRendererTest extends UnitTestCase {
       'widget' => 'details',
       'links' => 'entity_add',
       'entity_type' => 'tengstrom_demo_content',
-          // The query part is added by the MenuLinkAdd but since we are mocking the local action we need to add it manually.
+      // The query part is added by the MenuLinkAdd but since we are mocking the local action we need to add it manually.
       'query' => [
         'destination' => '/',
       ],
@@ -195,16 +195,18 @@ class LocalActionRendererTest extends UnitTestCase {
 
     $localActionOptions = new LocalActionOptionCollection([
       new LocalActionOption(
-              Markup::create('Bundle 1'),
-              AccessResult::forbidden()->addCacheContexts(['user.permissions']),
-              'node.add',
-              ['node_type' => 'bundle_1']
+        Markup::create('Bundle 1'),
+        Markup::create('Add Bundle 1'),
+        AccessResult::forbidden()->addCacheContexts(['user.permissions']),
+        'node.add',
+        ['node_type' => 'bundle_1']
       ),
       new LocalActionOption(
-              Markup::create('Bundle 2'),
-              AccessResult::neutral()->addCacheContexts(['user.permissions']),
-              'node.add',
-              ['node_type' => 'bundle_2']
+        Markup::create('Bundle 2'),
+        Markup::create('Add Bundle 2'),
+        AccessResult::neutral()->addCacheContexts(['user.permissions']),
+        'node.add',
+        ['node_type' => 'bundle_2']
       ),
     ]);
 
@@ -221,29 +223,31 @@ class LocalActionRendererTest extends UnitTestCase {
     $renderer = new LocalActionRenderer($optionsFactory, $accessManager);
 
     $renderElement = $renderer->createRenderElement(
-          $localAction,
-          $routeMatch,
-          $account,
-          'Add node'
-      );
+      $localAction,
+      $routeMatch,
+      $account,
+      'Add node'
+    );
 
     $expected = [
       '#theme' => 'actionlink_dropdown_details',
       '#dropdown' => [
         'title' => 'Add node',
         'options' => [
-                  [
-                    'title' => $localActionOptions->get(0)->getTitle(),
-                    'access' => $localActionOptions->get(0)->getAccessResult(),
-                    'route_name' => $localActionOptions->get(0)->getRouteName(),
-                    'route_parameters' => $localActionOptions->get(0)->getRouteParameters(),
-                  ],
-                  [
-                    'title' => $localActionOptions->get(1)->getTitle(),
-                    'access' => $localActionOptions->get(1)->getAccessResult(),
-                    'route_name' => $localActionOptions->get(1)->getRouteName(),
-                    'route_parameters' => $localActionOptions->get(1)->getRouteParameters(),
-                  ],
+          [
+            'title' => $localActionOptions->get(0)->getTitle(),
+            'fallback_title' => $localActionOptions->get(0)->getFallbackTitle(),
+            'access' => $localActionOptions->get(0)->getAccessResult(),
+            'route_name' => $localActionOptions->get(0)->getRouteName(),
+            'route_parameters' => $localActionOptions->get(0)->getRouteParameters(),
+          ],
+          [
+            'title' => $localActionOptions->get(1)->getTitle(),
+            'fallback_title' => $localActionOptions->get(1)->getFallbackTitle(),
+            'access' => $localActionOptions->get(1)->getAccessResult(),
+            'route_name' => $localActionOptions->get(1)->getRouteName(),
+            'route_parameters' => $localActionOptions->get(1)->getRouteParameters(),
+          ],
         ],
         'localized_options' => $pluginOptions,
       ],
@@ -256,9 +260,9 @@ class LocalActionRendererTest extends UnitTestCase {
 
   public function accessResultProvider(): array {
     return [
-          [AccessResultForbidden::class],
-          [AccessResultNeutral::class],
-          [AccessResultAllowed::class],
+      [AccessResultForbidden::class],
+      [AccessResultNeutral::class],
+      [AccessResultAllowed::class],
     ];
   }
 

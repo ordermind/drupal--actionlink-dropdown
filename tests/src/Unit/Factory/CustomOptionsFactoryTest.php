@@ -131,9 +131,9 @@ class CustomOptionsFactoryTest extends UnitTestCase {
       new LocalActionOption(
         $translatedTitles[0],
         new TranslatableMarkup(
-          (string) $fallbackTitlePrefix . ' @option', 
-          ['@option' => $translatedTitles[0]], 
-          ['context' => 'test_context'], 
+          (string) $fallbackTitlePrefix . ' @option',
+          ['@option' => $translatedTitles[0]],
+          ['context' => 'test_context'],
           \Drupal::service('string_translation')
         ),
         AccessResult::forbidden()->addCacheContexts(['user.permissions']),
@@ -143,9 +143,9 @@ class CustomOptionsFactoryTest extends UnitTestCase {
       new LocalActionOption(
         $translatedTitles[1],
         new TranslatableMarkup(
-          (string) $fallbackTitlePrefix . ' @option', 
-          ['@option' => $translatedTitles[1]], 
-          ['context' => 'test_context'], 
+          (string) $fallbackTitlePrefix . ' @option',
+          ['@option' => $translatedTitles[1]],
+          ['context' => 'test_context'],
           \Drupal::service('string_translation')
         ),
         AccessResult::neutral()->addCacheContexts(['user.permissions']),
@@ -155,9 +155,9 @@ class CustomOptionsFactoryTest extends UnitTestCase {
       new LocalActionOption(
         $translatedTitles[2],
         new TranslatableMarkup(
-          (string) $fallbackTitlePrefix . ' @option', 
-          ['@option' => $translatedTitles[2]], 
-          ['context' => 'test_context'], 
+          (string) $fallbackTitlePrefix . ' @option',
+          ['@option' => $translatedTitles[2]],
+          ['context' => 'test_context'],
           \Drupal::service('string_translation')
         ),
         AccessResult::allowed()->addCacheContexts(['user.permissions']),

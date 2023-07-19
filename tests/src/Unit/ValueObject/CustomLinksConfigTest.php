@@ -88,4 +88,5 @@ class CustomLinksConfigTest extends UnitTestCase {
       ],
     ];
   }
+
 }

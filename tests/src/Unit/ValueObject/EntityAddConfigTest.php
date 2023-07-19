@@ -86,4 +86,5 @@ class EntityAddConfigTest extends UnitTestCase {
       ],
     ];
   }
+
 }

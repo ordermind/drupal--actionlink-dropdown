@@ -52,9 +52,9 @@ class OptionsFactoryTest extends UnitTestCase {
     $expectedOptions = new LocalActionOptionCollection([
       new LocalActionOption(
         Markup::create('Go to Test link'),
-        Markup::create('Go to Test link'), 
-        AccessResult::allowed(), 
-        'user.admin_index', 
+        Markup::create('Go to Test link'),
+        AccessResult::allowed(),
+        'user.admin_index',
         ['key' => 'value']
       ),
     ]);
@@ -89,8 +89,8 @@ class OptionsFactoryTest extends UnitTestCase {
       new LocalActionOption(
         Markup::create('Go to Test link'),
         Markup::create('Go to Test link'),
-        AccessResult::allowed(), 
-        'user.admin_index', 
+        AccessResult::allowed(),
+        'user.admin_index',
         ['key' => 'value']
       ),
     ]);

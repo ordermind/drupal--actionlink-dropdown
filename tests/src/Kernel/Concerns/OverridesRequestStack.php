@@ -20,4 +20,5 @@ trait OverridesRequestStack {
 
     return $requestStack;
   }
+
 }

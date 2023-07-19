@@ -252,4 +252,5 @@ class CacheableLocalActionLinksFactoryTest extends EntityKernelTestBase {
 
     $this->assertEquals($expected, $renderElement);
   }
+
 }

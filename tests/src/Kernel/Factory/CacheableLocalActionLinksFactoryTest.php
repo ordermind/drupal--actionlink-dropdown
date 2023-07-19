@@ -211,6 +211,7 @@ class CacheableLocalActionLinksFactoryTest extends EntityKernelTestBase {
           'options' => [
             [
               'title' => Markup::create('Bundle 1'),
+              'fallback_title' => Markup::create('Add Bundle 1'),
               'route_name' => 'node.add',
               'route_parameters' => [
                 'node_type' => 'bundle_1',
@@ -219,6 +220,7 @@ class CacheableLocalActionLinksFactoryTest extends EntityKernelTestBase {
             ],
             [
               'title' => Markup::create('Bundle 2'),
+              'fallback_title' => Markup::create('Add Bundle 2'),
               'route_name' => 'node.add',
               'route_parameters' => [
                 'node_type' => 'bundle_2',

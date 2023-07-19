@@ -54,42 +54,50 @@ class CustomOptionsFactoryTest extends UnitTestCase {
 
     if (!empty($expectedTitleTranslationArguments['@option'])) {
       $expectedTitleTranslationArguments['@option'] = new TranslatableMarkup(
-            $expectedTitleTranslationArguments['@option'],
-            [],
-            ['context' => 'test_context'],
-            \Drupal::service('string_translation')
-        );
+        $expectedTitleTranslationArguments['@option'],
+        [],
+        ['context' => 'test_context'],
+        \Drupal::service('string_translation')
+      );
     }
+
+    $translatedTitle = new TranslatableMarkup(
+      $expectedTitleTranslationString,
+      $expectedTitleTranslationArguments,
+      ['context' => 'test_context'],
+      \Drupal::service('string_translation')
+    );
 
     $expectedOptions = new LocalActionOptionCollection([
       new LocalActionOption(
-              new TranslatableMarkup(
-                  $expectedTitleTranslationString,
-                  $expectedTitleTranslationArguments,
-                  ['context' => 'test_context'],
-                  \Drupal::service('string_translation')
-              ),
-              AccessResult::forbidden()->addCacheContexts(['user.permissions']),
-              'route_1',
-              ['key-1' => 'value-1'],
+        $translatedTitle,
+        new TranslatableMarkup(
+          (string) $fallbackTitlePrefix . ' @option',
+          ['@option' => $translatedTitle],
+          ['context' => 'test_context'],
+          \Drupal::service('string_translation')
+        ),
+        AccessResult::forbidden()->addCacheContexts(['user.permissions']),
+        'route_1',
+        ['key-1' => 'value-1'],
       ),
     ]);
 
     $config = new CustomLinksConfig(
-          new CustomLinkCollection([
-            new CustomLink('Option 1', 'route_1', ['key-1' => 'value-1']),
-          ]),
-          $fallbackTitlePrefix
-      );
+      new CustomLinkCollection([
+        new CustomLink('Option 1', 'route_1', ['key-1' => 'value-1']),
+      ]),
+      $fallbackTitlePrefix
+    );
     $customLink = $config->getLinks()->get(0);
 
     $mockAccessManager = $this->prophesize(AccessManagerInterface::class);
     $mockAccessManager->checkNamedRoute(
-          $customLink->getRouteName(),
-          $customLink->getRouteParameters(),
-          $account,
-          TRUE
-      )->willReturn(AccessResult::forbidden()->addCacheContexts(['user.permissions']));
+      $customLink->getRouteName(),
+      $customLink->getRouteParameters(),
+      $account,
+      TRUE
+    )->willReturn(AccessResult::forbidden()->addCacheContexts(['user.permissions']));
     $accessManager = $mockAccessManager->reveal();
 
     $factory = new CustomOptionsFactory($accessManager);
@@ -100,9 +108,9 @@ class CustomOptionsFactoryTest extends UnitTestCase {
 
   public function singleOptionProvider(): array {
     return [
-          ['Option 1', [], NULL],
-          ['Option 1', [], ''],
-          ['Test Prefix @option', ['@option' => 'Option 1'], 'Test Prefix'],
+      ['Option 1', [], NULL],
+      ['Option 1', [], ''],
+      ['Option 1', [], 'Test Prefix'],
     ];
   }
 
@@ -113,35 +121,59 @@ class CustomOptionsFactoryTest extends UnitTestCase {
     $mockAccount = $this->prophesize(AccountInterface::class);
     $account = $mockAccount->reveal();
 
+    $translatedTitles = [
+      new TranslatableMarkup('Option 1', [], ['context' => 'test_context'], \Drupal::service('string_translation')),
+      new TranslatableMarkup('Option 2', [], ['context' => 'test_context'], \Drupal::service('string_translation')),
+      new TranslatableMarkup('Option 3', [], ['context' => 'test_context'], \Drupal::service('string_translation')),
+    ];
+
     $expectedOptions = new LocalActionOptionCollection([
       new LocalActionOption(
-              new TranslatableMarkup('Option 1', [], ['context' => 'test_context'], \Drupal::service('string_translation')),
-              AccessResult::forbidden()->addCacheContexts(['user.permissions']),
-              'route_1',
-              ['key-1' => 'value-1'],
+        $translatedTitles[0],
+        new TranslatableMarkup(
+          (string) $fallbackTitlePrefix . ' @option', 
+          ['@option' => $translatedTitles[0]], 
+          ['context' => 'test_context'], 
+          \Drupal::service('string_translation')
+        ),
+        AccessResult::forbidden()->addCacheContexts(['user.permissions']),
+        'route_1',
+        ['key-1' => 'value-1'],
       ),
       new LocalActionOption(
-              new TranslatableMarkup('Option 2', [], ['context' => 'test_context'], \Drupal::service('string_translation')),
-              AccessResult::neutral()->addCacheContexts(['user.permissions']),
-              'route_2',
-              ['key-2' => 'value-2'],
+        $translatedTitles[1],
+        new TranslatableMarkup(
+          (string) $fallbackTitlePrefix . ' @option', 
+          ['@option' => $translatedTitles[1]], 
+          ['context' => 'test_context'], 
+          \Drupal::service('string_translation')
+        ),
+        AccessResult::neutral()->addCacheContexts(['user.permissions']),
+        'route_2',
+        ['key-2' => 'value-2'],
       ),
       new LocalActionOption(
-              new TranslatableMarkup('Option 3', [], ['context' => 'test_context'], \Drupal::service('string_translation')),
-              AccessResult::allowed()->addCacheContexts(['user.permissions']),
-              'route_3',
-              ['key-3' => 'value-3'],
+        $translatedTitles[2],
+        new TranslatableMarkup(
+          (string) $fallbackTitlePrefix . ' @option', 
+          ['@option' => $translatedTitles[2]], 
+          ['context' => 'test_context'], 
+          \Drupal::service('string_translation')
+        ),
+        AccessResult::allowed()->addCacheContexts(['user.permissions']),
+        'route_3',
+        ['key-3' => 'value-3'],
       ),
     ]);
 
     $config = new CustomLinksConfig(
-          new CustomLinkCollection([
-            new CustomLink('Option 1', 'route_1', ['key-1' => 'value-1']),
-            new CustomLink('Option 2', 'route_2', ['key-2' => 'value-2']),
-            new CustomLink('Option 3', 'route_3', ['key-3' => 'value-3']),
-          ]),
-          $fallbackTitlePrefix
-      );
+      new CustomLinkCollection([
+        new CustomLink('Option 1', 'route_1', ['key-1' => 'value-1']),
+        new CustomLink('Option 2', 'route_2', ['key-2' => 'value-2']),
+        new CustomLink('Option 3', 'route_3', ['key-3' => 'value-3']),
+      ]),
+      $fallbackTitlePrefix
+    );
 
     $accessResults = array_map(
           fn (string $accessResultClass) => (new $accessResultClass())->addCacheContexts(['user.permissions']),
@@ -150,17 +182,17 @@ class CustomOptionsFactoryTest extends UnitTestCase {
 
     $mockAccessManager = $this->prophesize(AccessManagerInterface::class);
     $config->getLinks()->each(
-          function (CustomLink $customLink, int $index) use ($expectedOptions, $mockAccessManager, $accessResults, $account) {
-              $expectedOptions->get($index)->getAccessResult()->addCacheContexts(['user.permissions']);
+      function (CustomLink $customLink, int $index) use ($expectedOptions, $mockAccessManager, $accessResults, $account) {
+        $expectedOptions->get($index)->getAccessResult()->addCacheContexts(['user.permissions']);
 
-              $mockAccessManager->checkNamedRoute(
-                  $customLink->getRouteName(),
-                  $customLink->getRouteParameters(),
-                  $account,
-                  TRUE
-              )->willReturn($accessResults[$index]);
-          }
-      );
+        $mockAccessManager->checkNamedRoute(
+            $customLink->getRouteName(),
+            $customLink->getRouteParameters(),
+            $account,
+            TRUE
+        )->willReturn($accessResults[$index]);
+      }
+    );
     $accessManager = $mockAccessManager->reveal();
 
     $factory = new CustomOptionsFactory($accessManager);
@@ -171,9 +203,9 @@ class CustomOptionsFactoryTest extends UnitTestCase {
 
   public function fallbackTitlePrefixProvider(): array {
     return [
-          [NULL],
-          [''],
-          ['Test Prefix'],
+      [NULL],
+      [''],
+      ['Test Prefix'],
     ];
   }
 

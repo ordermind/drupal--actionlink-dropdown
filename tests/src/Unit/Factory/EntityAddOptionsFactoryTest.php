@@ -101,8 +101,8 @@ class EntityAddOptionsFactoryTest extends UnitTestCase {
 
   public function provideEntityTypeIds(): array {
     return [
-          ['node'],
-          ['test_entity'],
+      ['node'],
+      ['test_entity'],
     ];
   }
 
@@ -110,16 +110,14 @@ class EntityAddOptionsFactoryTest extends UnitTestCase {
    * @dataProvider singleOptionProvider
    */
   public function testCreateSingleOption(
-        string $expectedTitleTranslationString,
-        array $expectedTitleTranslationArguments,
-        bool $expectTranslationMarkup,
-        ?string $fallbackTitlePrefix,
-        string $expectedRouteName,
-        array $expectedRouteParameters,
-        string $entityTypeId,
-        ?string $bundleEntityTypeId,
-        array $entityBundles
-    ): void {
+    string $expectedTitleString,
+    ?string $expectedFallbackTitlePrefix,
+    string $expectedRouteName,
+    array $expectedRouteParameters,
+    string $entityTypeId,
+    ?string $bundleEntityTypeId,
+    array $entityBundles
+  ): void {
     $mockEntityTypeDefinition = $this->prophesize(EntityTypeInterface::class);
     $mockEntityTypeDefinition->getBundleEntityType()->willReturn($bundleEntityTypeId);
     $entityTypeDefinition = $mockEntityTypeDefinition->reveal();
@@ -135,34 +133,33 @@ class EntityAddOptionsFactoryTest extends UnitTestCase {
     $mockAccount = $this->prophesize(AccountInterface::class);
     $account = $mockAccount->reveal();
 
-    $expectedTitle = Markup::create($expectedTitleTranslationString);
-    if ($expectTranslationMarkup) {
-      $expectedTitle = new TranslatableMarkup(
-            $expectedTitleTranslationString,
-            $expectedTitleTranslationArguments,
-            ['context' => 'test_context'],
-            \Drupal::service('string_translation')
-        );
-    }
+    $expectedTitle = Markup::create($expectedTitleString);
+    $expectedFallbackTitle = new TranslatableMarkup(
+      (string) $expectedFallbackTitlePrefix . ' @option',
+      ['@option' => $expectedTitleString],
+      ['context' => 'test_context'],
+      \Drupal::service('string_translation')
+    );
 
     $expectedOptions = new LocalActionOptionCollection([
       new LocalActionOption(
-              $expectedTitle,
-              AccessResult::forbidden()->addCacheContexts(['user.permissions']),
-              $expectedRouteName,
-              $expectedRouteParameters,
+        $expectedTitle,
+        $expectedFallbackTitle,
+        AccessResult::forbidden()->addCacheContexts(['user.permissions']),
+        $expectedRouteName,
+        $expectedRouteParameters,
       ),
     ]);
 
-    $config = new EntityAddConfig($entityTypeId, $fallbackTitlePrefix);
+    $config = new EntityAddConfig($entityTypeId, $expectedFallbackTitlePrefix);
 
     $mockAccessManager = $this->prophesize(AccessManagerInterface::class);
     $mockAccessManager->checkNamedRoute(
-          $expectedRouteName,
-          $expectedRouteParameters,
-          $account,
-          TRUE
-      )->willReturn(AccessResult::forbidden()->addCacheContexts(['user.permissions']));
+      $expectedRouteName,
+      $expectedRouteParameters,
+      $account,
+      TRUE
+    )->willReturn(AccessResult::forbidden()->addCacheContexts(['user.permissions']));
     $accessManager = $mockAccessManager->reveal();
 
     $factory = new EntityAddOptionsFactory($entityTypeManager, $bundleInfo, $accessManager);
@@ -182,12 +179,12 @@ class EntityAddOptionsFactoryTest extends UnitTestCase {
     ];
 
     return [
-          // Node.
-          ['Bundle 1', [], FALSE, NULL, 'node.add', [$bundleEntityTypeId => 'bundle_1'], 'node', $bundleEntityTypeId, $bundles],
-          ['Test Prefix @option', ['@option' => 'Bundle 1'], TRUE, 'Test Prefix', 'node.add', [$bundleEntityTypeId => 'bundle_1'], 'node', $bundleEntityTypeId, $bundles],
-          // Custom entity type.
-          ['Bundle 1', [], FALSE, NULL, 'entity.test_entity.add_form', [$bundleEntityTypeId => 'bundle_1'], 'test_entity', $bundleEntityTypeId, $bundles],
-          ['Test Prefix @option', ['@option' => 'Bundle 1'], TRUE, 'Test Prefix', 'entity.test_entity.add_form', [$bundleEntityTypeId => 'bundle_1'], 'test_entity', $bundleEntityTypeId, $bundles],
+      // Node.
+      ['Bundle 1', NULL, 'node.add', [$bundleEntityTypeId => 'bundle_1'], 'node', $bundleEntityTypeId, $bundles],
+      ['Bundle 1', 'Test Prefix', 'node.add', [$bundleEntityTypeId => 'bundle_1'], 'node', $bundleEntityTypeId, $bundles],
+      // Custom entity type.
+      ['Bundle 1', NULL, 'entity.test_entity.add_form', [$bundleEntityTypeId => 'bundle_1'], 'test_entity', $bundleEntityTypeId, $bundles],
+      ['Bundle 1', 'Test Prefix', 'entity.test_entity.add_form', [$bundleEntityTypeId => 'bundle_1'], 'test_entity', $bundleEntityTypeId, $bundles],
     ];
   }
 
@@ -225,31 +222,43 @@ class EntityAddOptionsFactoryTest extends UnitTestCase {
 
     $mockAccessManager = $this->prophesize(AccessManagerInterface::class);
     $mockAccessManager->checkNamedRoute(
-          $expectedRouteName,
-          [$bundleEntityTypeId => 'bundle_1'],
-          $account,
-          TRUE
-      )->willReturn(AccessResult::forbidden()->addCacheContexts(['user.permissions']));
+      $expectedRouteName,
+      [$bundleEntityTypeId => 'bundle_1'],
+      $account,
+      TRUE
+    )->willReturn(AccessResult::forbidden()->addCacheContexts(['user.permissions']));
     $mockAccessManager->checkNamedRoute(
-          $expectedRouteName,
-          [$bundleEntityTypeId => 'bundle_2'],
-          $account,
-          TRUE
-      )->willReturn(AccessResult::allowed()->addCacheContexts(['user.permissions']));
+      $expectedRouteName,
+      [$bundleEntityTypeId => 'bundle_2'],
+      $account,
+      TRUE
+    )->willReturn(AccessResult::allowed()->addCacheContexts(['user.permissions']));
     $accessManager = $mockAccessManager->reveal();
 
     $expectedOptions = new LocalActionOptionCollection([
       new LocalActionOption(
-              Markup::create('Bundle 1'),
-              AccessResult::forbidden()->addCacheContexts(['user.permissions']),
-              $expectedRouteName,
-              [$bundleEntityTypeId => 'bundle_1'],
+        Markup::create('Bundle 1'),
+        new TranslatableMarkup(
+          (string) $fallbackTitlePrefix . ' @option',
+          ['@option' => 'Bundle 1'],
+          ['context' => 'test_context'],
+          \Drupal::service('string_translation')
+        ),
+        AccessResult::forbidden()->addCacheContexts(['user.permissions']),
+        $expectedRouteName,
+        [$bundleEntityTypeId => 'bundle_1'],
       ),
       new LocalActionOption(
-              Markup::create('Bundle 2'),
-              AccessResult::allowed()->addCacheContexts(['user.permissions']),
-              $expectedRouteName,
-              [$bundleEntityTypeId => 'bundle_2'],
+        Markup::create('Bundle 2'),
+        new TranslatableMarkup(
+          (string) $fallbackTitlePrefix . ' @option',
+          ['@option' => 'Bundle 2'],
+          ['context' => 'test_context'],
+          \Drupal::service('string_translation')
+        ),
+        AccessResult::allowed()->addCacheContexts(['user.permissions']),
+        $expectedRouteName,
+        [$bundleEntityTypeId => 'bundle_2'],
       ),
     ]);
 
@@ -263,14 +272,14 @@ class EntityAddOptionsFactoryTest extends UnitTestCase {
 
   public function createMultipleOptionsProvider(): array {
     return [
-          // Node.
-          ['node.add', 'node', NULL],
-          ['node.add', 'node', ''],
-          ['node.add', 'node', 'Test Prefix'],
-          // Custom entity type.
-          ['entity.test_entity.add_form', 'test_entity', NULL],
-          ['entity.test_entity.add_form', 'test_entity', ''],
-          ['entity.test_entity.add_form', 'test_entity', 'Test Prefix'],
+      // Node.
+      ['node.add', 'node', NULL],
+      ['node.add', 'node', ''],
+      ['node.add', 'node', 'Test Prefix'],
+      // Custom entity type.
+      ['entity.test_entity.add_form', 'test_entity', NULL],
+      ['entity.test_entity.add_form', 'test_entity', ''],
+      ['entity.test_entity.add_form', 'test_entity', 'Test Prefix'],
     ];
   }
 

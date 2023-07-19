@@ -50,7 +50,13 @@ class OptionsFactoryTest extends UnitTestCase {
 
   public function testCreateOptionsCanUseCustomLinksFactory(): void {
     $expectedOptions = new LocalActionOptionCollection([
-      new LocalActionOption(Markup::create('Go to Test link'), AccessResult::allowed(), 'user.admin_index', ['key' => 'value']),
+      new LocalActionOption(
+        Markup::create('Go to Test link'),
+        Markup::create('Go to Test link'), 
+        AccessResult::allowed(), 
+        'user.admin_index', 
+        ['key' => 'value']
+      ),
     ]);
 
     $account = $this->prophesize(AccountInterface::class)->reveal();
@@ -58,11 +64,11 @@ class OptionsFactoryTest extends UnitTestCase {
     $config = [
       'links' => LocalActionLinksTypeEnum::CUSTOM,
       'custom_links' => [
-              [
-                'title' => 'Test link',
-                'route_name' => 'user.admin_index',
-                'route_parameters' => ['key' => 'value'],
-              ],
+        [
+          'title' => 'Test link',
+          'route_name' => 'user.admin_index',
+          'route_parameters' => ['key' => 'value'],
+        ],
       ],
       'fallback_title_prefix' => 'Go to',
     ];
@@ -80,7 +86,13 @@ class OptionsFactoryTest extends UnitTestCase {
 
   public function testCreateOptionsCanUseEntityAddLinksFactory(): void {
     $expectedOptions = new LocalActionOptionCollection([
-      new LocalActionOption(Markup::create('Go to Test link'), AccessResult::allowed(), 'user.admin_index', ['key' => 'value']),
+      new LocalActionOption(
+        Markup::create('Go to Test link'),
+        Markup::create('Go to Test link'),
+        AccessResult::allowed(), 
+        'user.admin_index', 
+        ['key' => 'value']
+      ),
     ]);
 
     $account = $this->prophesize(AccountInterface::class)->reveal();

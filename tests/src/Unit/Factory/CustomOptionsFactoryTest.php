@@ -186,10 +186,10 @@ class CustomOptionsFactoryTest extends UnitTestCase {
         $expectedOptions->get($index)->getAccessResult()->addCacheContexts(['user.permissions']);
 
         $mockAccessManager->checkNamedRoute(
-            $customLink->getRouteName(),
-            $customLink->getRouteParameters(),
-            $account,
-            TRUE
+          $customLink->getRouteName(),
+          $customLink->getRouteParameters(),
+          $account,
+          TRUE
         )->willReturn($accessResults[$index]);
       }
     );

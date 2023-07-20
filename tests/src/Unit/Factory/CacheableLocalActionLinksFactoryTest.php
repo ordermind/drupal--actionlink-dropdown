@@ -45,127 +45,127 @@ class CacheableLocalActionLinksFactoryTest extends UnitTestCase {
 
     $localActions = [
       'do_nothing' => new LocalizedLocalActionDecorator(
-              (function () {
-                  $mock = $this->prophesize(LocalActionDefault::class);
-                  $mock->getPluginId()->willReturn('do_nothing');
-                  return $mock->reveal();
-              })(),
-              'Test local action do nothing'
+        (function () {
+          $mock = $this->prophesize(LocalActionDefault::class);
+          $mock->getPluginId()->willReturn('do_nothing');
+          return $mock->reveal();
+        })(),
+        'Test local action do nothing'
       ),
       'single_link' => new LocalizedLocalActionDecorator(
-              (function () {
-                  $mock = $this->prophesize(LocalActionDefault::class);
-                  $mock->getPluginId()->willReturn('single_link');
-                  return $mock->reveal();
-              })(),
-              'Test local action single link'
+        (function () {
+          $mock = $this->prophesize(LocalActionDefault::class);
+          $mock->getPluginId()->willReturn('single_link');
+          return $mock->reveal();
+        })(),
+        'Test local action single link'
       ),
       'dropdown' => new LocalizedLocalActionDecorator(
-              (function () {
-                  $mock = $this->prophesize(LocalActionDefault::class);
-                  $mock->getPluginId()->willReturn('dropdown');
-                  return $mock->reveal();
-              })(),
-              'Test local action dropdown'
+        (function () {
+          $mock = $this->prophesize(LocalActionDefault::class);
+          $mock->getPluginId()->willReturn('dropdown');
+          return $mock->reveal();
+        })(),
+        'Test local action dropdown'
       ),
     ];
 
     $mockRenderer = $this->prophesize(LocalActionRenderer::class);
     $mockRenderer
       ->createRenderElement(
-              $localActions['do_nothing']->getDecoratedObject(),
-              $routeMatch,
-              $account,
-              $localActions['do_nothing']->getLocalizedTitle()
-          )
+        $localActions['do_nothing']->getDecoratedObject(),
+        $routeMatch,
+        $account,
+        $localActions['do_nothing']->getLocalizedTitle()
+      )
       ->willReturn([]);
 
     $mockRenderer
       ->createRenderElement(
-              $localActions['single_link']->getDecoratedObject(),
-              $routeMatch,
-              $account,
-              $localActions['single_link']->getLocalizedTitle()
-          )
+        $localActions['single_link']->getDecoratedObject(),
+        $routeMatch,
+        $account,
+        $localActions['single_link']->getLocalizedTitle()
+      )
       ->will(
-              function () use ($localActions) {
-                  return [
-                    '#theme' => 'menu_local_action',
-                    '#link' => [
-                      'title' => $localActions['single_link']->getLocalizedTitle(),
-                      'url' => Url::fromRoute(
-                              'node.add',
-                              ['node_type' => 'bundle_1']
-                      ),
-                      'localized_options' => [],
-                    ],
-                    '#access' => AccessResult::allowed()->addCacheContexts(['user.permissions']),
-                    '#weight' => 5,
-                  ];
-              }
-          );
+        function () use ($localActions) {
+          return [
+            '#theme' => 'menu_local_action',
+            '#link' => [
+              'title' => $localActions['single_link']->getLocalizedTitle(),
+              'url' => Url::fromRoute(
+                'node.add',
+                ['node_type' => 'bundle_1']
+              ),
+              'localized_options' => [],
+            ],
+            '#access' => AccessResult::allowed()->addCacheContexts(['user.permissions']),
+            '#weight' => 5,
+          ];
+        }
+      );
 
     $mockRenderer
       ->createRenderElement(
-              $localActions['dropdown']->getDecoratedObject(),
-              $routeMatch,
-              $account,
-              $localActions['dropdown']->getLocalizedTitle()
-          )
+        $localActions['dropdown']->getDecoratedObject(),
+        $routeMatch,
+        $account,
+        $localActions['dropdown']->getLocalizedTitle()
+      )
       ->will(
-              function () use ($localActions) {
-                  return [
-                    '#theme' => 'actionlink_dropdown_details',
-                    '#dropdown' => [
-                      'title' => $localActions['dropdown']->getLocalizedTitle(),
-                      'options' => [
-                              [
-                                'title' => Markup::create('Bundle 1'),
-                                'route_name' => 'node.add',
-                                'route_parameters' => [
-                                  'node_type' => 'bundle_1',
-                                ],
-                                'access' => AccessResult::forbidden()->addCacheContexts(['user.permissions']),
-                              ],
-                              [
-                                'title' => Markup::create('Bundle 2'),
-                                'route_name' => 'node.add',
-                                'route_parameters' => [
-                                  'node_type' => 'bundle_2',
-                                ],
-                                'access' => AccessResult::allowed()->addCacheContexts(['user.permissions']),
-                              ],
-                      ],
-                      'localized_options' => [
-                        'widget' => 'details',
-                        'links' => 'entity_add',
-                        'entity_type' => 'node',
-                        'query' => [
-                          'destination' => '/',
-                        ],
-                      ],
-                    ],
-                    '#access' => AccessResult::allowed()->addCacheContexts(['user.permissions']),
-                    '#weight' => 5,
-                  ];
-              }
-          );
+        function () use ($localActions) {
+          return [
+            '#theme' => 'actionlink_dropdown_details',
+            '#dropdown' => [
+              'title' => $localActions['dropdown']->getLocalizedTitle(),
+              'options' => [
+                [
+                  'title' => Markup::create('Bundle 1'),
+                  'route_name' => 'node.add',
+                  'route_parameters' => [
+                    'node_type' => 'bundle_1',
+                  ],
+                  'access' => AccessResult::forbidden()->addCacheContexts(['user.permissions']),
+                ],
+                [
+                  'title' => Markup::create('Bundle 2'),
+                  'route_name' => 'node.add',
+                  'route_parameters' => [
+                    'node_type' => 'bundle_2',
+                  ],
+                  'access' => AccessResult::allowed()->addCacheContexts(['user.permissions']),
+                ],
+              ],
+              'localized_options' => [
+                'widget' => 'details',
+                'links' => 'entity_add',
+                'entity_type' => 'node',
+                'query' => [
+                  'destination' => '/',
+                ],
+              ],
+            ],
+            '#access' => AccessResult::allowed()->addCacheContexts(['user.permissions']),
+            '#weight' => 5,
+          ];
+        }
+      );
     $renderer = $mockRenderer->reveal();
 
     $factory = new CacheableLocalActionLinksFactory($renderer);
 
     $expected = [
       'single_link' => $renderer->createRenderElement(
-              $localActions['single_link']->getDecoratedObject(),
-              $routeMatch,
-              $account,
-              $localActions['single_link']->getLocalizedTitle()
+        $localActions['single_link']->getDecoratedObject(),
+        $routeMatch,
+        $account,
+        $localActions['single_link']->getLocalizedTitle()
       ),
       'dropdown' => $renderer->createRenderElement(
-              $localActions['dropdown']->getDecoratedObject(),
-              $routeMatch,
-              $account,
-              $localActions['dropdown']->getLocalizedTitle()
+        $localActions['dropdown']->getDecoratedObject(),
+        $routeMatch,
+        $account,
+        $localActions['dropdown']->getLocalizedTitle()
       ),
       '#cache' => [
         'contexts' => [

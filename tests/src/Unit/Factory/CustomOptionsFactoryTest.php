@@ -10,7 +10,7 @@ use Drupal\actionlink_dropdown\Factory\CustomOptionsFactory;
 use Drupal\actionlink_dropdown\ValueObject\CustomLink;
 use Drupal\actionlink_dropdown\ValueObject\CustomLinksConfig;
 use Drupal\actionlink_dropdown\ValueObject\LocalActionOption;
-use Drupal\Component\DependencyInjection\ContainerInterface;
+use Drupal\Component\DependencyInjection\Container;
 use Drupal\Core\Access\AccessManagerInterface;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Access\AccessResultAllowed;
@@ -37,10 +37,10 @@ class CustomOptionsFactoryTest extends UnitTestCase {
     $mockTranslationService = $this->prophesize(TranslationInterface::class);
     $translationService = $mockTranslationService->reveal();
 
-    $mockContainer = $this->prophesize(ContainerInterface::class);
-    $mockContainer->get('cache_contexts_manager')->willReturn($cacheContextManager);
-    $mockContainer->get('string_translation')->willReturn($translationService);
-    $container = $mockContainer->reveal();
+    $container = new Container();
+
+    $container->set('cache_contexts_manager', $cacheContextManager);
+    $container->set('string_translation', $translationService);
 
     \Drupal::setContainer($container);
   }

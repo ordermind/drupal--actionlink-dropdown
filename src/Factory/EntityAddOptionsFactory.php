@@ -40,10 +40,11 @@ class EntityAddOptionsFactory {
     }
 
     $bundles = $this->bundleInfo->getBundleInfo($entityTypeId);
-    uasort($bundles, fn (array $a, array $b) => $a['label'] <=> $b['label']);
     if (empty($bundles)) {
       return new LocalActionOptionCollection();
     }
+
+    uasort($bundles, fn (array $a, array $b) => $a['label'] <=> $b['label']);
 
     return new LocalActionOptionCollection(
       array_map(function (string $bundleId, array $bundleInfo) use ($entityTypeId, $bundleEntityTypeId, $account, $config, $translationContext) {

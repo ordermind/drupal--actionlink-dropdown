@@ -57,7 +57,7 @@ class CustomLinksConfigTest extends UnitTestCase {
     $this->assertEquals($expectedFallbackTitlePrefix, $config->getFallbackTitlePrefix());
   }
 
-  public function fromArrayCreatesValidObjectProvider(): array {
+  public static function fromArrayCreatesValidObjectProvider(): array {
     $expectedLinks = new CustomLinkCollection([
       new CustomLink('Test Link', 'test_route'),
     ]);

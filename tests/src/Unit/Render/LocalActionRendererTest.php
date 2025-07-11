@@ -258,7 +258,7 @@ class LocalActionRendererTest extends UnitTestCase {
     $this->assertEquals($expected, $renderElement);
   }
 
-  public function accessResultProvider(): array {
+  public static function accessResultProvider(): array {
     return [
       [AccessResultForbidden::class],
       [AccessResultNeutral::class],

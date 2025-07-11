@@ -26,7 +26,7 @@ class CustomLinkTest extends UnitTestCase {
     CustomLink::fromArray($values);
   }
 
-  public function fromArrayThrowsExceptionOnEmptyTitleValueProvider(): array {
+  public static function fromArrayThrowsExceptionOnEmptyTitleValueProvider(): array {
     return [
           [NULL],
           [''],
@@ -72,7 +72,7 @@ class CustomLinkTest extends UnitTestCase {
     $this->assertEquals($expectedRouteParameters, $customLink->getRouteParameters());
   }
 
-  public function fromArrayCreatesValidObjectProvider(): array {
+  public static function fromArrayCreatesValidObjectProvider(): array {
     $title = 'Test Title';
     $routeName = 'test_route';
     return [

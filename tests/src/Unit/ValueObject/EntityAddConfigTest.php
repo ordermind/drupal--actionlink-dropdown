@@ -26,7 +26,7 @@ class EntityAddConfigTest extends UnitTestCase {
     EntityAddConfig::fromArray($config);
   }
 
-  public function fromArrayThrowsExceptionOnEmptyEntityTypeValueProvider(): array {
+  public static function fromArrayThrowsExceptionOnEmptyEntityTypeValueProvider(): array {
     return [
       [NULL],
       [''],
@@ -60,7 +60,7 @@ class EntityAddConfigTest extends UnitTestCase {
     $this->assertEquals($expectedFallbackTitlePrefix, $config->getFallbackTitlePrefix());
   }
 
-  public function fromArrayCreatesValidObjectProvider(): array {
+  public static function fromArrayCreatesValidObjectProvider(): array {
     $entityType = 'test_entity_type';
 
     return [

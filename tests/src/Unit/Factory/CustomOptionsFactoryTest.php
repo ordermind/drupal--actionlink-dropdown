@@ -106,7 +106,7 @@ class CustomOptionsFactoryTest extends UnitTestCase {
     $this->assertEquals($expectedOptions, $options);
   }
 
-  public function singleOptionProvider(): array {
+  public static function singleOptionProvider(): array {
     return [
       ['Option 1', [], NULL],
       ['Option 1', [], ''],
@@ -201,7 +201,7 @@ class CustomOptionsFactoryTest extends UnitTestCase {
     $this->assertEquals($expectedOptions, $options);
   }
 
-  public function fallbackTitlePrefixProvider(): array {
+  public static function fallbackTitlePrefixProvider(): array {
     return [
       [NULL],
       [''],

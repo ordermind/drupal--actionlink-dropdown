@@ -99,7 +99,7 @@ class EntityAddOptionsFactoryTest extends UnitTestCase {
     $this->assertSame(0, $options->count());
   }
 
-  public function provideEntityTypeIds(): array {
+  public static function provideEntityTypeIds(): array {
     return [
       ['node'],
       ['test_entity'],
@@ -168,7 +168,7 @@ class EntityAddOptionsFactoryTest extends UnitTestCase {
     $this->assertEquals($expectedOptions, $options);
   }
 
-  public function singleOptionProvider(): array {
+  public static function singleOptionProvider(): array {
     $bundleEntityTypeId = 'test_bundle_entity_type_id';
 
     $bundles = [
@@ -270,7 +270,7 @@ class EntityAddOptionsFactoryTest extends UnitTestCase {
     $this->assertEquals($expectedOptions, $options);
   }
 
-  public function createMultipleOptionsProvider(): array {
+  public static function createMultipleOptionsProvider(): array {
     return [
       // Node.
       ['node.add', 'node', NULL],

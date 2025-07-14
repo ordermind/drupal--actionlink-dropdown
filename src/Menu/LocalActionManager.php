@@ -34,7 +34,7 @@ class LocalActionManager extends BaseManager {
     LanguageManagerInterface $languageManager,
     AccessManagerInterface $accessManager,
     AccountInterface $account,
-    CacheableLocalActionLinksFactory $actionLinksFactory
+    CacheableLocalActionLinksFactory $actionLinksFactory,
   ) {
     parent::__construct(
       $argumentResolver,

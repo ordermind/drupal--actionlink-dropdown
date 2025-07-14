@@ -2,7 +2,7 @@
     "name": "drupal/actionlink_dropdown",
     "type": "drupal-module--tengstrom",
     "require": {
-        "drupal/core": "^9 || ^10 || ^11",
+        "drupal/core": "^10 || ^11",
         "gamez/typed-collection": "^5.2",
         "ordermind/php-helpers": "^2.0"
     }

@@ -23,7 +23,7 @@ class CacheableLocalActionLinksFactory {
   public function createFromLocalizedLocalActions(
     RouteMatchInterface $routeMatch,
     AccountInterface $account,
-    LocalizedLocalActionDecorator ...$localActions
+    LocalizedLocalActionDecorator ...$localActions,
   ): array {
     $links = [];
     $cacheability = new CacheableMetadata();

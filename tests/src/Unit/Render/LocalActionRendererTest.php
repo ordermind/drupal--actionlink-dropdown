@@ -15,11 +15,11 @@ use Drupal\Core\Access\AccessResultAllowed;
 use Drupal\Core\Access\AccessResultForbidden;
 use Drupal\Core\Access\AccessResultNeutral;
 use Drupal\Core\Cache\Context\CacheContextsManager;
+use Drupal\Core\Menu\LocalActionWithDestination;
 use Drupal\Core\Render\Markup;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
-use Drupal\menu_ui\Plugin\Menu\LocalAction\MenuLinkAdd;
 use Drupal\Tests\UnitTestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
@@ -54,7 +54,7 @@ class LocalActionRendererTest extends UnitTestCase {
     $mockAccessManager->checkNamedRoute(Argument::cetera())->willReturn($expectedAccessResult);
     $accessManager = $mockAccessManager->reveal();
 
-    $mockLocalAction = $this->prophesize(MenuLinkAdd::class);
+    $mockLocalAction = $this->prophesize(LocalActionWithDestination::class);
     $mockLocalAction->getRouteName()->willReturn('user.admin_index');
     $mockLocalAction->getRouteParameters(Argument::cetera())->willReturn([]);
     $mockLocalAction->getOptions(Argument::cetera())->willReturn([
@@ -106,13 +106,13 @@ class LocalActionRendererTest extends UnitTestCase {
       'links' => 'entity_add',
       'entity_type' => 'tengstrom_demo_content',
       'fallback_title_prefix' => 'Add',
-          // The query part is added by the MenuLinkAdd but since we are mocking the local action we need to add it manually.
+          // The query part is added by the LocalActionWithDestination but since we are mocking the local action we need to add it manually.
       'query' => [
         'destination' => '/',
       ],
     ];
 
-    $mockLocalAction = $this->prophesize(MenuLinkAdd::class);
+    $mockLocalAction = $this->prophesize(LocalActionWithDestination::class);
     $mockLocalAction->getPluginDefinition()->willReturn($pluginDefinition);
     $mockLocalAction->getRouteName()->willReturn('user.admin_index');
     $mockLocalAction->getRouteParameters(Argument::cetera())->willReturn([]);
@@ -176,13 +176,13 @@ class LocalActionRendererTest extends UnitTestCase {
       'widget' => 'details',
       'links' => 'entity_add',
       'entity_type' => 'tengstrom_demo_content',
-      // The query part is added by the MenuLinkAdd but since we are mocking the local action we need to add it manually.
+      // The query part is added by the LocalActionWithDestination but since we are mocking the local action we need to add it manually.
       'query' => [
         'destination' => '/',
       ],
     ];
 
-    $mockLocalAction = $this->prophesize(MenuLinkAdd::class);
+    $mockLocalAction = $this->prophesize(LocalActionWithDestination::class);
     $mockLocalAction->getPluginDefinition()->willReturn($pluginDefinition);
     $mockLocalAction->getRouteName()->willReturn('user.admin_index');
     $mockLocalAction->getRouteParameters(Argument::cetera())->willReturn([]);

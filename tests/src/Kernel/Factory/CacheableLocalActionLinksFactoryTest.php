@@ -16,7 +16,6 @@ use Drupal\Core\Routing\RouteProviderInterface;
 use Drupal\Core\Routing\UrlGeneratorInterface;
 use Drupal\Core\Url;
 use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
-use Drupal\menu_ui\Plugin\Menu\LocalAction\MenuLinkAdd;
 use Drupal\Tests\actionlink_dropdown\Kernel\Concerns\OverridesRequestStack;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
 use Drupal\user\Entity\User;
@@ -39,6 +38,7 @@ class CacheableLocalActionLinksFactoryTest extends EntityKernelTestBase {
     $this->requestStack = $this->createRequestStack();
 
     $this->enableModules(['node', 'actionlink_dropdown']);
+    $this->installEntitySchema('node');
     $this->installConfig(['node']);
     $this->setUpCurrentUser(['uid' => 1]);
 
@@ -95,7 +95,7 @@ class CacheableLocalActionLinksFactoryTest extends EntityKernelTestBase {
           'user.permissions',
         ],
         'tags' => [],
-        'max-age' => 0,
+        'max-age' => -1,
       ],
     ];
 
@@ -122,12 +122,12 @@ class CacheableLocalActionLinksFactoryTest extends EntityKernelTestBase {
         'fallback_title_prefix' => 'Go to',
       ],
       'appears_on' => ['<front>'],
-      'class' => 'Drupal\menu_ui\Plugin\Menu\LocalAction\MenuLinkAdd',
+      'class' => 'Drupal\Core\Menu\LocalActionWithDestination',
       'provider' => 'test_provider',
     ];
 
     $redirectDestination = new RedirectDestination($this->requestStack, $this->urlGenerator);
-    $localAction = new MenuLinkAdd([], $pluginDefinition['id'], $pluginDefinition, $this->routeProvider, $redirectDestination);
+    $localAction = new LocalActionWithDestination([], $pluginDefinition['id'], $pluginDefinition, $this->routeProvider, $redirectDestination);
 
     /** @var \Drupal\user\Entity\User $user */
     $user = User::load(1);
@@ -165,7 +165,7 @@ class CacheableLocalActionLinksFactoryTest extends EntityKernelTestBase {
           'user.permissions',
         ],
         'tags' => [],
-        'max-age' => 0,
+        'max-age' => -1,
       ],
     ];
 
@@ -188,12 +188,12 @@ class CacheableLocalActionLinksFactoryTest extends EntityKernelTestBase {
         'entity_type' => 'node',
       ],
       'appears_on' => ['<front>'],
-      'class' => 'Drupal\menu_ui\Plugin\Menu\LocalAction\MenuLinkAdd',
+      'class' => 'Drupal\Core\Menu\LocalActionWithDestination',
       'provider' => 'test_provider',
     ];
 
     $redirectDestination = new RedirectDestination($this->requestStack, $this->urlGenerator);
-    $localAction = new MenuLinkAdd([], $pluginDefinition['id'], $pluginDefinition, $this->routeProvider, $redirectDestination);
+    $localAction = new LocalActionWithDestination([], $pluginDefinition['id'], $pluginDefinition, $this->routeProvider, $redirectDestination);
 
     /** @var \Drupal\user\Entity\User $user */
     $user = User::load(1);
@@ -247,7 +247,7 @@ class CacheableLocalActionLinksFactoryTest extends EntityKernelTestBase {
           'user.permissions',
         ],
         'tags' => [],
-        'max-age' => 0,
+        'max-age' => -1,
       ],
     ];
 

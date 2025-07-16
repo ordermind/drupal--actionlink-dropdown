@@ -9,6 +9,7 @@ use Drupal\actionlink_dropdown\Render\LocalActionRenderer;
 use Drupal\actionlink_dropdown\ValueObject\LocalizedLocalActionDecorator;
 use Drupal\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\Core\Menu\LocalActionDefault;
 use Drupal\Core\Render\Markup;
@@ -48,6 +49,9 @@ class CacheableLocalActionLinksFactoryTest extends UnitTestCase {
         (function () {
           $mock = $this->prophesize(LocalActionDefault::class);
           $mock->getPluginId()->willReturn('do_nothing');
+          $mock->getCacheContexts()->willReturn([]);
+          $mock->getCacheTags()->willReturn([]);
+          $mock->getCacheMaxAge()->willReturn(Cache::PERMANENT);
           return $mock->reveal();
         })(),
         'Test local action do nothing'
@@ -56,6 +60,9 @@ class CacheableLocalActionLinksFactoryTest extends UnitTestCase {
         (function () {
           $mock = $this->prophesize(LocalActionDefault::class);
           $mock->getPluginId()->willReturn('single_link');
+          $mock->getCacheContexts()->willReturn([]);
+          $mock->getCacheTags()->willReturn([]);
+          $mock->getCacheMaxAge()->willReturn(Cache::PERMANENT);
           return $mock->reveal();
         })(),
         'Test local action single link'
@@ -64,6 +71,9 @@ class CacheableLocalActionLinksFactoryTest extends UnitTestCase {
         (function () {
           $mock = $this->prophesize(LocalActionDefault::class);
           $mock->getPluginId()->willReturn('dropdown');
+          $mock->getCacheContexts()->willReturn([]);
+          $mock->getCacheTags()->willReturn([]);
+          $mock->getCacheMaxAge()->willReturn(Cache::PERMANENT);
           return $mock->reveal();
         })(),
         'Test local action dropdown'
@@ -173,7 +183,7 @@ class CacheableLocalActionLinksFactoryTest extends UnitTestCase {
           'user.permissions',
         ],
         'tags' => [],
-        'max-age' => 0,
+        'max-age' => -1,
       ],
     ];
 

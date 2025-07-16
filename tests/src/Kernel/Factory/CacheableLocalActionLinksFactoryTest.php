@@ -8,6 +8,7 @@ use Drupal\actionlink_dropdown\Factory\CacheableLocalActionLinksFactory;
 use Drupal\actionlink_dropdown\Render\LocalActionRenderer;
 use Drupal\actionlink_dropdown\ValueObject\LocalizedLocalActionDecorator;
 use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Menu\LocalActionWithDestination;
 use Drupal\Core\Render\Markup;
 use Drupal\Core\Routing\RedirectDestination;
 use Drupal\Core\Routing\RouteMatchInterface;
@@ -57,12 +58,12 @@ class CacheableLocalActionLinksFactoryTest extends EntityKernelTestBase {
       'route_parameters' => [],
       'options' => [],
       'appears_on' => ['<front>'],
-      'class' => 'Drupal\menu_ui\Plugin\Menu\LocalAction\MenuLinkAdd',
+      'class' => 'Drupal\Core\Menu\LocalActionWithDestination',
       'provider' => 'test_provider',
     ];
 
     $redirectDestination = new RedirectDestination($this->requestStack, $this->urlGenerator);
-    $localAction = new MenuLinkAdd([], $pluginDefinition['id'], $pluginDefinition, $this->routeProvider, $redirectDestination);
+    $localAction = new LocalActionWithDestination([], $pluginDefinition['id'], $pluginDefinition, $this->routeProvider, $redirectDestination);
 
     /** @var \Drupal\user\Entity\User $user */
     $user = User::load(1);
